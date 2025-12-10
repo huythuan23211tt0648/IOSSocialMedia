@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 55;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,20 @@
 		7393DF972EE9AA96009B68C3 /* IOSSocialMediaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7393DF962EE9AA96009B68C3 /* IOSSocialMediaTests.swift */; };
 		7393DFA12EE9AA97009B68C3 /* IOSSocialMediaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7393DFA02EE9AA97009B68C3 /* IOSSocialMediaUITests.swift */; };
 		7393DFA32EE9AA97009B68C3 /* IOSSocialMediaUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7393DFA22EE9AA97009B68C3 /* IOSSocialMediaUITestsLaunchTests.swift */; };
+		EA21A5BC2EE9B50800D83464 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */; };
+		EA21A5BD2EE9B50800D83464 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5BA2EE9B50800D83464 /* ImagePicker.swift */; };
+		EA21A5BE2EE9B50800D83464 /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5B92EE9B50800D83464 /* ChatModels.swift */; };
+		EA21A5D12EE9B51600D83464 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5C12EE9B51600D83464 /* HomeView.swift */; };
+		EA21A5D22EE9B51600D83464 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5CC2EE9B51600D83464 /* ProfileView.swift */; };
+		EA21A5D42EE9B51600D83464 /* ProfileLoggedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5CA2EE9B51600D83464 /* ProfileLoggedInView.swift */; };
+		EA21A5D52EE9B51600D83464 /* MessagesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5C72EE9B51600D83464 /* MessagesListView.swift */; };
+		EA21A5D62EE9B51600D83464 /* ProfileLoggedOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5CB2EE9B51600D83464 /* ProfileLoggedOutView.swift */; };
+		EA21A5D72EE9B51600D83464 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5C62EE9B51600D83464 /* ChatView.swift */; };
+		EA21A5D82EE9B51600D83464 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5C92EE9B51600D83464 /* LoginView.swift */; };
+		EA21A5D92EE9B51600D83464 /* CreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5BF2EE9B51600D83464 /* CreateView.swift */; };
+		EA21A5DA2EE9B51600D83464 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5CD2EE9B51600D83464 /* RegisterView.swift */; };
+		EA21A5DB2EE9B51600D83464 /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5C52EE9B51600D83464 /* ChatBubble.swift */; };
+		EA21A5DE2EE9B91900D83464 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5DD2EE9B91500D83464 /* MainTabView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,7 +58,25 @@
 		7393DF9C2EE9AA97009B68C3 /* IOSSocialMediaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IOSSocialMediaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7393DFA02EE9AA97009B68C3 /* IOSSocialMediaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSSocialMediaUITests.swift; sourceTree = "<group>"; };
 		7393DFA22EE9AA97009B68C3 /* IOSSocialMediaUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSSocialMediaUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		EA21A5B92EE9B50800D83464 /* ChatModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
+		EA21A5BA2EE9B50800D83464 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		EA21A5BF2EE9B51600D83464 /* CreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateView.swift; sourceTree = "<group>"; };
+		EA21A5C12EE9B51600D83464 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		EA21A5C52EE9B51600D83464 /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
+		EA21A5C62EE9B51600D83464 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		EA21A5C72EE9B51600D83464 /* MessagesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesListView.swift; sourceTree = "<group>"; };
+		EA21A5C92EE9B51600D83464 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		EA21A5CA2EE9B51600D83464 /* ProfileLoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileLoggedInView.swift; sourceTree = "<group>"; };
+		EA21A5CB2EE9B51600D83464 /* ProfileLoggedOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileLoggedOutView.swift; sourceTree = "<group>"; };
+		EA21A5CC2EE9B51600D83464 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		EA21A5CD2EE9B51600D83464 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		EA21A5DD2EE9B91500D83464 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		EA21A5DF2EE9C58900D83464 /* Firebase */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Firebase; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		7393DF7F2EE9AA94009B68C3 /* Frameworks */ = {
@@ -94,8 +126,12 @@
 		7393DF842EE9AA94009B68C3 /* IOSSocialMedia */ = {
 			isa = PBXGroup;
 			children = (
+				EA21A5DF2EE9C58900D83464 /* Firebase */,
+				EA21A5D02EE9B51600D83464 /* Views */,
+				EA21A5BB2EE9B50800D83464 /* Model */,
 				7393DF852EE9AA94009B68C3 /* IOSSocialMediaApp.swift */,
 				7393DF872EE9AA94009B68C3 /* ContentView.swift */,
+				EA21A5DD2EE9B91500D83464 /* MainTabView.swift */,
 				7393DF892EE9AA96009B68C3 /* Assets.xcassets */,
 				7393DF8B2EE9AA96009B68C3 /* Preview Content */,
 			);
@@ -127,6 +163,65 @@
 			path = IOSSocialMediaUITests;
 			sourceTree = "<group>";
 		};
+		EA21A5BB2EE9B50800D83464 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */,
+				EA21A5B92EE9B50800D83464 /* ChatModels.swift */,
+				EA21A5BA2EE9B50800D83464 /* ImagePicker.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		EA21A5C02EE9B51600D83464 /* Creates */ = {
+			isa = PBXGroup;
+			children = (
+				EA21A5BF2EE9B51600D83464 /* CreateView.swift */,
+			);
+			path = Creates;
+			sourceTree = "<group>";
+		};
+		EA21A5C42EE9B51600D83464 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				EA21A5C12EE9B51600D83464 /* HomeView.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		EA21A5C82EE9B51600D83464 /* Messages */ = {
+			isa = PBXGroup;
+			children = (
+				EA21A5C52EE9B51600D83464 /* ChatBubble.swift */,
+				EA21A5C62EE9B51600D83464 /* ChatView.swift */,
+				EA21A5C72EE9B51600D83464 /* MessagesListView.swift */,
+			);
+			path = Messages;
+			sourceTree = "<group>";
+		};
+		EA21A5CE2EE9B51600D83464 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				EA21A5C92EE9B51600D83464 /* LoginView.swift */,
+				EA21A5CA2EE9B51600D83464 /* ProfileLoggedInView.swift */,
+				EA21A5CB2EE9B51600D83464 /* ProfileLoggedOutView.swift */,
+				EA21A5CC2EE9B51600D83464 /* ProfileView.swift */,
+				EA21A5CD2EE9B51600D83464 /* RegisterView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		EA21A5D02EE9B51600D83464 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				EA21A5C02EE9B51600D83464 /* Creates */,
+				EA21A5C42EE9B51600D83464 /* Main */,
+				EA21A5C82EE9B51600D83464 /* Messages */,
+				EA21A5CE2EE9B51600D83464 /* Profile */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -141,6 +236,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EA21A5DF2EE9C58900D83464 /* Firebase */,
 			);
 			name = IOSSocialMedia;
 			productName = IOSSocialMedia;
@@ -257,8 +355,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA21A5D12EE9B51600D83464 /* HomeView.swift in Sources */,
+				EA21A5D22EE9B51600D83464 /* ProfileView.swift in Sources */,
+				EA21A5D42EE9B51600D83464 /* ProfileLoggedInView.swift in Sources */,
+				EA21A5D52EE9B51600D83464 /* MessagesListView.swift in Sources */,
+				EA21A5D62EE9B51600D83464 /* ProfileLoggedOutView.swift in Sources */,
+				EA21A5D72EE9B51600D83464 /* ChatView.swift in Sources */,
+				EA21A5D82EE9B51600D83464 /* LoginView.swift in Sources */,
+				EA21A5D92EE9B51600D83464 /* CreateView.swift in Sources */,
+				EA21A5DA2EE9B51600D83464 /* RegisterView.swift in Sources */,
+				EA21A5DB2EE9B51600D83464 /* ChatBubble.swift in Sources */,
+				EA21A5DE2EE9B91900D83464 /* MainTabView.swift in Sources */,
 				7393DF882EE9AA94009B68C3 /* ContentView.swift in Sources */,
 				7393DF862EE9AA94009B68C3 /* IOSSocialMediaApp.swift in Sources */,
+				EA21A5BC2EE9B50800D83464 /* AuthViewModel.swift in Sources */,
+				EA21A5BD2EE9B50800D83464 /* ImagePicker.swift in Sources */,
+				EA21A5BE2EE9B50800D83464 /* ChatModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
