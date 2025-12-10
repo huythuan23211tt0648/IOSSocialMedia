@@ -305,7 +305,7 @@
 				};
 			};
 			buildConfigurationList = 7393DF7D2EE9AA94009B68C3 /* Build configuration list for PBXProject "IOSSocialMedia" */;
-			compatibilityVersion = "Xcode 13.0";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
