@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -74,10 +74,6 @@
 		EA21A5DD2EE9B91500D83464 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		EA21A5DF2EE9C58900D83464 /* Firebase */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Firebase; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
 		7393DF7F2EE9AA94009B68C3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -126,7 +122,6 @@
 		7393DF842EE9AA94009B68C3 /* IOSSocialMedia */ = {
 			isa = PBXGroup;
 			children = (
-				EA21A5DF2EE9C58900D83464 /* Firebase */,
 				EA21A5D02EE9B51600D83464 /* Views */,
 				EA21A5BB2EE9B50800D83464 /* Model */,
 				7393DF852EE9AA94009B68C3 /* IOSSocialMediaApp.swift */,
@@ -236,9 +231,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				EA21A5DF2EE9C58900D83464 /* Firebase */,
 			);
 			name = IOSSocialMedia;
 			productName = IOSSocialMedia;
