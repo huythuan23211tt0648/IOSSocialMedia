@@ -14,7 +14,7 @@ struct MainTabView: View {
 
             NavigationView {
                 HomeView()
-//                    .navigationTitle("Home")
+                    .navigationTitle("Home")
             }
             .tabItem {
                 Image(systemName: "house.fill")
