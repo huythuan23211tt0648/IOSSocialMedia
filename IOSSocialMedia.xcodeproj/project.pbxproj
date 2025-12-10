@@ -313,6 +313,7 @@
 				Base,
 			);
 			mainGroup = 7393DF792EE9AA94009B68C3;
+			minimizedProjectReferenceProxies = 1;
 			productRefGroup = 7393DF832EE9AA94009B68C3 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
