@@ -334,7 +334,6 @@
 				Base,
 			);
 			mainGroup = 7393DF792EE9AA94009B68C3;
-			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				EA5C72012EEA8D4B008945E9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
