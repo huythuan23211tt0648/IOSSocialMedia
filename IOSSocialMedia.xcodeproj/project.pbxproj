@@ -34,6 +34,8 @@
 		EA5C72092EEA8EDD008945E9 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = EA5C72082EEA8EDD008945E9 /* FirebaseStorage */; };
 		EA5C720B2EEA8EDD008945E9 /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = EA5C720A2EEA8EDD008945E9 /* FirebaseStorageCombine-Community */; };
 		EA5C720D2EEA8F4C008945E9 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = EA5C720C2EEA8F4C008945E9 /* FirebaseCore */; };
+		EAA51B252EEAC15900296924 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA51B242EEAC15900296924 /* TodoItem.swift */; };
+		EAA51B2B2EEAC22800296924 /* ContentViewFireBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA51B2A2EEAC22000296924 /* ContentViewFireBase.swift */; };
 		EAB7C2582EEA69B700BF5D4A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EAB7C2572EEA69B700BF5D4A /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -79,8 +81,14 @@
 		EA21A5CC2EE9B51600D83464 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		EA21A5CD2EE9B51600D83464 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		EA21A5DD2EE9B91500D83464 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		EAA51B242EEAC15900296924 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
+		EAA51B2A2EEAC22000296924 /* ContentViewFireBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewFireBase.swift; sourceTree = "<group>"; };
 		EAB7C2572EEA69B700BF5D4A /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		EAA51B262EEAC1EC00296924 /* ViewModel */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ViewModel; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		7393DF7F2EE9AA94009B68C3 /* Frameworks */ = {
@@ -136,6 +144,7 @@
 		7393DF842EE9AA94009B68C3 /* IOSSocialMedia */ = {
 			isa = PBXGroup;
 			children = (
+				EAA51B262EEAC1EC00296924 /* ViewModel */,
 				EA21A5D02EE9B51600D83464 /* Views */,
 				EA21A5BB2EE9B50800D83464 /* Model */,
 				7393DF852EE9AA94009B68C3 /* IOSSocialMediaApp.swift */,
@@ -176,6 +185,7 @@
 		EA21A5BB2EE9B50800D83464 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				EAA51B242EEAC15900296924 /* TodoItem.swift */,
 				EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */,
 				EA21A5B92EE9B50800D83464 /* ChatModels.swift */,
 				EA21A5BA2EE9B50800D83464 /* ImagePicker.swift */,
@@ -224,6 +234,7 @@
 		EA21A5D02EE9B51600D83464 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				EAA51B2A2EEAC22000296924 /* ContentViewFireBase.swift */,
 				EA21A5C02EE9B51600D83464 /* Creates */,
 				EA21A5C42EE9B51600D83464 /* Main */,
 				EA21A5C82EE9B51600D83464 /* Messages */,
@@ -246,6 +257,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EAA51B262EEAC1EC00296924 /* ViewModel */,
 			);
 			name = IOSSocialMedia;
 			productName = IOSSocialMedia;
@@ -376,8 +390,10 @@
 				EA21A5D82EE9B51600D83464 /* LoginView.swift in Sources */,
 				EA21A5D92EE9B51600D83464 /* CreateView.swift in Sources */,
 				EA21A5DA2EE9B51600D83464 /* RegisterView.swift in Sources */,
+				EAA51B2B2EEAC22800296924 /* ContentViewFireBase.swift in Sources */,
 				EA21A5DB2EE9B51600D83464 /* ChatBubble.swift in Sources */,
 				EA21A5DE2EE9B91900D83464 /* MainTabView.swift in Sources */,
+				EAA51B252EEAC15900296924 /* TodoItem.swift in Sources */,
 				7393DF882EE9AA94009B68C3 /* ContentView.swift in Sources */,
 				7393DF862EE9AA94009B68C3 /* IOSSocialMediaApp.swift in Sources */,
 				EA21A5BC2EE9B50800D83464 /* AuthViewModel.swift in Sources */,
