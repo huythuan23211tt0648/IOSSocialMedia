@@ -86,10 +86,6 @@
 		EAB7C2572EEA69B700BF5D4A /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		EAA51B262EEAC1EC00296924 /* ViewModel */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ViewModel; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
 		7393DF7F2EE9AA94009B68C3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -243,6 +239,13 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		EAA51B262EEAC1EC00296924 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -257,9 +260,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				EAA51B262EEAC1EC00296924 /* ViewModel */,
 			);
 			name = IOSSocialMedia;
 			productName = IOSSocialMedia;
