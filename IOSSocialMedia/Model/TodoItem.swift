@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseFirestoreSwift // <--- THÊM DÒNG NÀY
 
 struct TodoItem: Identifiable, Codable {
     @DocumentID var id: String? // ID do Firestore tự tạo
