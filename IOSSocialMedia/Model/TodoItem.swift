@@ -12,5 +12,6 @@ import FirebaseFirestoreSwift // <--- THÊM DÒNG NÀY
 struct TodoItem: Identifiable, Codable {
     @DocumentID var id: String? // ID do Firestore tự tạo
     var title: String
-    var isCompleted: Bool = false
+    var isCompleted: Bool	 = false
 }
+

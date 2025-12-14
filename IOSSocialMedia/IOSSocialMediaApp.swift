@@ -28,8 +28,11 @@ struct IOSSocialMediaApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentViewFireBase()
-//            MainTabView()
+
+
+
+//            ContentViewFireBase()
+            MainTabView()
         }
     }
 }
