@@ -11,5 +11,7 @@ struct ProfileView: View {
                 LoginView()
             }
         }
+
+        
     }
 }
