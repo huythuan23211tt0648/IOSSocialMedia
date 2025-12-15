@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct LoginView: View {
     @EnvironmentObject var auth: AuthViewModel
@@ -151,9 +152,33 @@ struct LoginView: View {
                 // AuthViewModel đã set isLoggedIn = true, UI khác sẽ tự phản ứng
                 break
             case .failure(let error):
-                errorMessage = error.localizedDescription
+                errorMessage = vietnameseLoginMessage(for: error)
                 showErrorAlert = true
             }
+        }
+    }
+    
+    private func vietnameseLoginMessage(for error: Error) -> String {
+        let nsError = error as NSError
+        
+        guard nsError.domain == AuthErrorDomain,
+              let code = AuthErrorCode.Code(rawValue: nsError.code) else {
+            return "Không thể đăng nhập. Vui lòng thử lại.\n\nChi tiết: \(error.localizedDescription)"
+        }
+        
+        switch code {
+        case .invalidEmail:
+            return "Email không hợp lệ. Vui lòng kiểm tra lại định dạng email."
+        case .userNotFound:
+            return "Không tìm thấy tài khoản với email này. Vui lòng kiểm tra lại hoặc đăng ký mới."
+        case .wrongPassword:
+            return "Mật khẩu không đúng. Vui lòng thử lại."
+        case .networkError:
+            return "Lỗi kết nối mạng. Vui lòng kiểm tra lại internet và thử lại."
+        case .tooManyRequests:
+            return "Bạn đã đăng nhập sai quá nhiều lần. Vui lòng thử lại sau ít phút."
+        default:
+            return "Sai tên email hoặc mật khẩu. Vui lòng thử lại."
         }
     }
 

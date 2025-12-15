@@ -12,29 +12,29 @@ import FirebaseFirestoreSwift // <--- THÊM DÒNG NÀY
 // ==========================================
 // 1. USER MODEL (Collection: "users")
 // ==========================================
-struct User: Identifiable, Codable {
-    // @DocumentID: Tự động lấy ID của document (UID) gán vào biến này
-    @DocumentID var id: String?
-    
-    var username: String
-    var email: String
-    var profileImageUrl: String? // Có thể null nếu chưa up avatar
-    var bio: String?
-    
-    // Dùng Date của Swift, Firebase sẽ tự chuyển đổi
-    var joinedDate: Date
-    
-    // CodingKeys: Dùng nếu tên biến trong Code khác tên field trên Firebase
-    // Ví dụ: Trong code là 'profileImageUrl', trên Firebase là 'profile_image_url'
-    enum CodingKeys: String, CodingKey {
-        case id
-        case username
-        case email
-        case profileImageUrl = "profile_image_url"
-        case bio
-        case joinedDate = "joined_date"
-    }
-}
+//struct User: Identifiable, Codable {
+//    // @DocumentID: Tự động lấy ID của document (UID) gán vào biến này
+//    @DocumentID var id: String?
+//
+//    var username: String
+//    var email: String
+//    var profileImageUrl: String? // Có thể null nếu chưa up avatar
+//    var bio: String?
+//
+//    // Dùng Date của Swift, Firebase sẽ tự chuyển đổi
+//    var joinedDate: Date
+//
+//    // CodingKeys: Dùng nếu tên biến trong Code khác tên field trên Firebase
+//    // Ví dụ: Trong code là 'profileImageUrl', trên Firebase là 'profile_image_url'
+//    enum CodingKeys: String, CodingKey {
+//        case id
+//        case username
+//        case email
+//        case profileImageUrl = "profile_image_url"
+//        case bio
+//        case joinedDate = "joined_date"
+//    }
+//}
 
 // ==========================================
 // 2. POST MODEL (Collection: "posts")

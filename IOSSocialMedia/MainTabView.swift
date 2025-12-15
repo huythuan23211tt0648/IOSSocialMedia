@@ -50,7 +50,7 @@ struct MainTabView: View {
             }
 
             NavigationView {
-                ProfileLoggedInView()
+                ProfileView()
                     .environmentObject(auth)
                     .navigationTitle("Profile")
                     .navigationBarHidden(true)

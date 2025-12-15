@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct RegisterView: View {
     @EnvironmentObject var auth: AuthViewModel
@@ -12,6 +13,7 @@ struct RegisterView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showErrorAlert = false
+    @State private var showSuccessAlert = false
 
     var body: some View {
         ZStack {
@@ -177,6 +179,13 @@ struct RegisterView: View {
         }, message: {
             Text(errorMessage ?? "Đã có lỗi xảy ra, vui lòng thử lại.")
         })
+        .alert("Đăng ký thành công", isPresented: $showSuccessAlert, actions: {
+            Button("OK") {
+                dismiss()
+            }
+        }, message: {
+            Text("Tài khoản đã được tạo. Bạn có thể đăng nhập và sử dụng ngay.")
+        })
     }
 
     private var isRegisterDisabled: Bool {
@@ -192,11 +201,36 @@ struct RegisterView: View {
             
             switch result {
             case .success:
-                dismiss()
+                showSuccessAlert = true
             case .failure(let error):
-                errorMessage = error.localizedDescription
+                errorMessage = vietnameseMessage(for: error)
                 showErrorAlert = true
             }
+        }
+    }
+    
+    private func vietnameseMessage(for error: Error) -> String {
+        let nsError = error as NSError
+        
+        // Chỉ xử lý các lỗi từ Firebase Auth, còn lại dùng mô tả mặc định
+        guard nsError.domain == AuthErrorDomain,
+              let code = AuthErrorCode.Code(rawValue: nsError.code) else {
+            return "Đã có lỗi xảy ra, vui lòng thử lại.\n\nChi tiết: \(error.localizedDescription)"
+        }
+        
+        switch code {
+        case .invalidEmail:
+            return "Email không hợp lệ. Vui lòng kiểm tra lại định dạng email."
+        case .emailAlreadyInUse:
+            return "Email này đã được sử dụng cho một tài khoản khác."
+        case .weakPassword:
+            return "Mật khẩu quá yếu. Vui lòng dùng mật khẩu mạnh hơn (ít nhất 6 ký tự)."
+        case .networkError:
+            return "Lỗi kết nối mạng. Vui lòng kiểm tra lại internet và thử lại."
+        case .tooManyRequests:
+            return "Bạn đã thao tác quá nhiều lần. Vui lòng thử lại sau ít phút."
+        default:
+            return "Không thể đăng ký tài khoản. Vui lòng thử lại.\n\nChi tiết: \(error.localizedDescription)"
         }
     }
 }
