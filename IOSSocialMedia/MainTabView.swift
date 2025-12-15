@@ -9,6 +9,16 @@ import SwiftUI
 struct MainTabView: View {
     @StateObject var auth = AuthViewModel()
     
+    init() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .white
+        UITabBar.appearance().standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+    }
+    
     var body: some View {
         TabView {
 
@@ -42,7 +52,6 @@ struct MainTabView: View {
             NavigationView {
                 ProfileView()
                     .environmentObject(auth)
-                    .navigationTitle("Profile")
             }
             .tabItem {
                 Image(systemName: "person.crop.circle")

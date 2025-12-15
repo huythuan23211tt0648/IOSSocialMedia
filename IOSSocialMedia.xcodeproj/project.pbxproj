@@ -15,6 +15,7 @@
 		7393DFA12EE9AA97009B68C3 /* IOSSocialMediaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7393DFA02EE9AA97009B68C3 /* IOSSocialMediaUITests.swift */; };
 		7393DFA32EE9AA97009B68C3 /* IOSSocialMediaUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7393DFA22EE9AA97009B68C3 /* IOSSocialMediaUITestsLaunchTests.swift */; };
 		A00C2A262EED1034003AF12D /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = A00C2A252EED1034003AF12D /* .gitignore */; };
+		A02E99B72EF0313E00679C03 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A02E99B62EF0313E00679C03 /* User.swift */; };
 		EA21A5BC2EE9B50800D83464 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */; };
 		EA21A5BD2EE9B50800D83464 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5BA2EE9B50800D83464 /* ImagePicker.swift */; };
 		EA21A5BE2EE9B50800D83464 /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5B92EE9B50800D83464 /* ChatModels.swift */; };
@@ -77,6 +78,7 @@
 		7393DFA02EE9AA97009B68C3 /* IOSSocialMediaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSSocialMediaUITests.swift; sourceTree = "<group>"; };
 		7393DFA22EE9AA97009B68C3 /* IOSSocialMediaUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSSocialMediaUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		A00C2A252EED1034003AF12D /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		A02E99B62EF0313E00679C03 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		EA21A5B92EE9B50800D83464 /* ChatModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
 		EA21A5BA2EE9B50800D83464 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
@@ -201,9 +203,9 @@
 			isa = PBXGroup;
 			children = (
 				EAA51B242EEAC15900296924 /* TodoItem.swift */,
-				EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */,
 				EA21A5B92EE9B50800D83464 /* ChatModels.swift */,
 				EA21A5BA2EE9B50800D83464 /* ImagePicker.swift */,
+				A02E99B62EF0313E00679C03 /* User.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -261,6 +263,7 @@
 		EAA51B262EEAC1EC00296924 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */,
 				EA9C86202EEC6A6200446181 /* TodoViewModel.swift */,
 			);
 			path = ViewModel;
@@ -424,6 +427,7 @@
 				EA21A5D72EE9B51600D83464 /* ChatView.swift in Sources */,
 				EA21A5D82EE9B51600D83464 /* LoginView.swift in Sources */,
 				EA21A5D92EE9B51600D83464 /* CreateView.swift in Sources */,
+				A02E99B72EF0313E00679C03 /* User.swift in Sources */,
 				EA9C86212EEC6A6200446181 /* TodoViewModel.swift in Sources */,
 				EA21A5DA2EE9B51600D83464 /* RegisterView.swift in Sources */,
 				EAA51B2B2EEAC22800296924 /* ContentViewFireBase.swift in Sources */,

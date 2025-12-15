@@ -5,12 +5,11 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationView {
-//            if auth.isLoggedIn {
-//                ProfileLoggedInView()
-//            } else {
-//                ProfileLoggedOutView()
-//            }
-            ProfileLoggedInView()
+            if auth.isLoggedIn {
+                ProfileLoggedInView()
+            } else {
+                LoginView()
+            }
         }
     }
 }
