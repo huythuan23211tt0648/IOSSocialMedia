@@ -40,14 +40,16 @@ struct MainTabView: View {
             }
 
             NavigationView {
-                ProfileView()
+                ProfileLoggedInView()
                     .environmentObject(auth)
                     .navigationTitle("Profile")
+                    .navigationBarHidden(true)
             }
             .tabItem {
                 Image(systemName: "person.crop.circle")
                 Text("Profile")
             }
+           
         }
     }
 }

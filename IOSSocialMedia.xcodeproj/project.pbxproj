@@ -47,7 +47,6 @@
 		EAA51B2B2EEAC22800296924 /* ContentViewFireBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA51B2A2EEAC22000296924 /* ContentViewFireBase.swift */; };
 		EAB7C2582EEA69B700BF5D4A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EAB7C2572EEA69B700BF5D4A /* GoogleService-Info.plist */; };
 		EAE898982EEEE49800C0C6AD /* PostService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE898972EEEE49800C0C6AD /* PostService.swift */; };
-		EAE8989A2EEEE4DD00C0C6AD /* PostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE898992EEEE4DD00C0C6AD /* PostViewModel.swift */; };
 		EAE8989E2EEEEB0B00C0C6AD /* FireBaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE8989D2EEEEB0B00C0C6AD /* FireBaseModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -99,7 +98,6 @@
 		EAA51B2A2EEAC22000296924 /* ContentViewFireBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewFireBase.swift; sourceTree = "<group>"; };
 		EAB7C2572EEA69B700BF5D4A /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		EAE898972EEEE49800C0C6AD /* PostService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostService.swift; sourceTree = "<group>"; };
-		EAE898992EEEE4DD00C0C6AD /* PostViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostViewModel.swift; sourceTree = "<group>"; };
 		EAE8989D2EEEEB0B00C0C6AD /* FireBaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireBaseModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -270,7 +268,6 @@
 			isa = PBXGroup;
 			children = (
 				EA9C86202EEC6A6200446181 /* TodoViewModel.swift */,
-				EAE898992EEEE4DD00C0C6AD /* PostViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -449,7 +446,6 @@
 				EAA51B252EEAC15900296924 /* TodoItem.swift in Sources */,
 				EAE8989E2EEEEB0B00C0C6AD /* FireBaseModel.swift in Sources */,
 				7393DF882EE9AA94009B68C3 /* ContentView.swift in Sources */,
-				EAE8989A2EEEE4DD00C0C6AD /* PostViewModel.swift in Sources */,
 				EAE898982EEEE49800C0C6AD /* PostService.swift in Sources */,
 				7393DF862EE9AA94009B68C3 /* IOSSocialMediaApp.swift in Sources */,
 				EA21A5BC2EE9B50800D83464 /* AuthViewModel.swift in Sources */,
