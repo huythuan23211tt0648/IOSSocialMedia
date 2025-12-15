@@ -11,7 +11,7 @@ struct LoginView: View {
     @State private var showErrorAlert = false
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             LinearGradient(colors: [.blue.opacity(0.9), .purple.opacity(0.8)],
                            startPoint: .topLeading,
                            endPoint: .bottomTrailing)
@@ -35,6 +35,8 @@ struct LoginView: View {
                         .foregroundColor(.white)
                         .shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 4)
                 }
+                .padding(.top, 80)
+
 
                 VStack(spacing: 8) {
                     Text("Chào mừng trở lại")
@@ -48,89 +50,92 @@ struct LoginView: View {
                 }
                 .padding(.top, 20)
 
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Email")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                 VStack(alignment: .leading, spacing: 16) {
+                     VStack(alignment: .leading, spacing: 6) {
+                         Text("Email")
+                             .font(.subheadline)
+                             .foregroundColor(.secondary)
+ 
+                         HStack {
+                             Image(systemName: "envelope")
+                                 .foregroundColor(.blue)
+                             TextField("email@domain.com", text: $email)
+                                 .keyboardType(.emailAddress)
+                                 .textInputAutocapitalization(.never)
+                                 .autocorrectionDisabled()
+                         }
+                         .padding()
+                         .background(Color(.systemGray6))
+                         .cornerRadius(12)
+                     }
 
-                        HStack {
-                            Image(systemName: "envelope")
-                                .foregroundColor(.blue)
-                            TextField("email@domain.com", text: $email)
-                                .keyboardType(.emailAddress)
-                                .textInputAutocapitalization(.never)
-                                .autocorrectionDisabled()
-                        }
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                    }
+                     VStack(alignment: .leading, spacing: 6) {
+                         Text("Mật khẩu")
+                             .font(.subheadline)
+                             .foregroundColor(.secondary)
+ 
+                         HStack {
+                             Image(systemName: "lock")
+                                 .foregroundColor(.blue)
+                             Group {
+                                 if showPassword {
+                                     TextField("••••••••", text: $password)
+                                 } else {
+                                     SecureField("••••••••", text: $password)
+                                 }
+                             }
+                             Button(action: { showPassword.toggle() }) {
+                                 Image(systemName: showPassword ? "eye.slash" : "eye")
+                                     .foregroundColor(.secondary)
+                             }
+                         }
+                         .padding()
+                         .background(Color(.systemGray6))
+                         .cornerRadius(12)
+                     }
 
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Mật khẩu")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                     Button(action: login) {
+                         Text("Đăng nhập")
+                             .fontWeight(.semibold)
+                             .frame(maxWidth: .infinity)
+                             .padding()
+                             .foregroundColor(.white)
+                             .background((email.isEmpty || password.isEmpty || isLoading) ? Color.gray : Color.blue)
+                             .cornerRadius(14)
+                             .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 6)
+                     }
+                     .disabled(email.isEmpty || password.isEmpty || isLoading)
 
-                        HStack {
-                            Image(systemName: "lock")
-                                .foregroundColor(.blue)
-                            Group {
-                                if showPassword {
-                                    TextField("••••••••", text: $password)
-                                } else {
-                                    SecureField("••••••••", text: $password)
-                                }
-                            }
-                            Button(action: { showPassword.toggle() }) {
-                                Image(systemName: showPassword ? "eye.slash" : "eye")
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                    }
+                     HStack {
+                         Button("Quên mật khẩu?") {
+                             // TODO: hook up reset flow when available
+                         }
+                         .font(.footnote)
+                         .foregroundColor(.blue)
+ 
+                         Spacer()
+ 
+                         NavigationLink(destination: RegisterView().environmentObject(auth)) {
+                             Text("Tạo tài khoản")
+                                 .font(.footnote)
+                                 .foregroundColor(.blue)
+                         }
+                     }
+                 }
+                 .padding()
+                 .background(Color.white)
+                 .cornerRadius(20)
+                 .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
+                 .padding(.horizontal)
 
-                    Button(action: login) {
-                        Text("Đăng nhập")
-                            .fontWeight(.semibold)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background((email.isEmpty || password.isEmpty || isLoading) ? Color.gray : Color.blue)
-                            .cornerRadius(14)
-                            .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 6)
-                    }
-                    .disabled(email.isEmpty || password.isEmpty || isLoading)
-
-                    HStack {
-                        Button("Quên mật khẩu?") {
-                            // TODO: hook up reset flow when available
-                        }
-                        .font(.footnote)
-                        .foregroundColor(.blue)
-
-                        Spacer()
-
-                        NavigationLink(destination: RegisterView().environmentObject(auth)) {
-                            Text("Tạo tài khoản")
-                                .font(.footnote)
-                                .foregroundColor(.blue)
-                        }
-                    }
-                }
-                .padding()
-                .background(Color.white)
-                .cornerRadius(20)
-                .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
-                .padding(.horizontal)
-
-                Spacer()
+                 Spacer()
             }
-            .frame(maxHeight: .infinity, alignment: .top)
-            .padding(.top, 16)
+            .ignoresSafeArea()
+
+            
         }
+        .frame(maxHeight: .infinity, alignment: .top)
+//        .padding(.top, 16)
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
         .alert("Đăng nhập thất bại", isPresented: $showErrorAlert, actions: {
