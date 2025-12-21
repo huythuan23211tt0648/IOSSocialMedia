@@ -198,7 +198,7 @@ private struct PostView: View {
 }
 // MARK: COMMENTView
 
-struct CommentsView: View {
+private struct CommentsUserView: View {
     // Input field cần biến state, nhưng ở đây mình chỉ demo hiển thị
     // Bạn nhớ copy lại struct CommentInputView ở câu trả lời trước vào file này nhé
     @Environment(\.presentationMode) var presentationMode

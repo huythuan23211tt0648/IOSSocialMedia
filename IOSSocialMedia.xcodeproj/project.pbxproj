@@ -16,6 +16,7 @@
 		7393DFA32EE9AA97009B68C3 /* IOSSocialMediaUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7393DFA22EE9AA97009B68C3 /* IOSSocialMediaUITestsLaunchTests.swift */; };
 		A00C2A262EED1034003AF12D /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = A00C2A252EED1034003AF12D /* .gitignore */; };
 		A02E99B72EF0313E00679C03 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A02E99B62EF0313E00679C03 /* User.swift */; };
+		CE915B132EF1328400DE5D1C /* MyPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE915B122EF1328400DE5D1C /* MyPostsView.swift */; };
 		EA21A5BC2EE9B50800D83464 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */; };
 		EA21A5BD2EE9B50800D83464 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5BA2EE9B50800D83464 /* ImagePicker.swift */; };
 		EA21A5BE2EE9B50800D83464 /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5B92EE9B50800D83464 /* ChatModels.swift */; };
@@ -82,6 +83,7 @@
 		7393DFA22EE9AA97009B68C3 /* IOSSocialMediaUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSSocialMediaUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		A00C2A252EED1034003AF12D /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		A02E99B62EF0313E00679C03 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		CE915B122EF1328400DE5D1C /* MyPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPostsView.swift; sourceTree = "<group>"; };
 		EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		EA21A5B92EE9B50800D83464 /* ChatModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
 		EA21A5BA2EE9B50800D83464 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
@@ -206,6 +208,14 @@
 			path = IOSSocialMediaUITests;
 			sourceTree = "<group>";
 		};
+		CE915B112EF1324A00DE5D1C /* MyListPost */ = {
+			isa = PBXGroup;
+			children = (
+				CE915B122EF1328400DE5D1C /* MyPostsView.swift */,
+			);
+			path = MyListPost;
+			sourceTree = "<group>";
+		};
 		EA21A5BB2EE9B50800D83464 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -260,6 +270,7 @@
 		EA21A5D02EE9B51600D83464 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				CE915B112EF1324A00DE5D1C /* MyListPost */,
 				EAA51B2A2EEAC22000296924 /* ContentViewFireBase.swift */,
 				EA21A5C02EE9B51600D83464 /* Creates */,
 				EA21A5C42EE9B51600D83464 /* Main */,
@@ -451,6 +462,7 @@
 				EAA51B2B2EEAC22800296924 /* ContentViewFireBase.swift in Sources */,
 				EA21A5DB2EE9B51600D83464 /* ChatBubble.swift in Sources */,
 				EA21A5DE2EE9B91900D83464 /* MainTabView.swift in Sources */,
+				CE915B132EF1328400DE5D1C /* MyPostsView.swift in Sources */,
 				EAA51B252EEAC15900296924 /* TodoItem.swift in Sources */,
 				EAE8989E2EEEEB0B00C0C6AD /* FireBaseModel.swift in Sources */,
 				7393DF882EE9AA94009B68C3 /* ContentView.swift in Sources */,

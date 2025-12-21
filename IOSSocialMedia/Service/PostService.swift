@@ -69,7 +69,26 @@ struct PostService {
             "comments_count": FieldValue.increment(Int64(1))
         ])
     }
-
-
-  
+    
+    
+    
+    // MARK: - DELETE POST
+    func deletePost(postId: String) async throws {
+        let postRef = PostService.db.collection("posts").document(postId)
+        
+        // Xóa tất cả sub-collections (likes, comments)
+        // Lưu ý: Firestore không tự động xóa sub-collections, cần xóa thủ công
+        let likesSnapshot = try await postRef.collection("likes").getDocuments()
+        for likeDoc in likesSnapshot.documents {
+            try await likeDoc.reference.delete()
+        }
+        
+        let commentsSnapshot = try await postRef.collection("comments").getDocuments()
+        for commentDoc in commentsSnapshot.documents {
+            try await commentDoc.reference.delete()
+        }
+        
+        // Xóa post chính
+        try await postRef.delete()
+    }
 }
