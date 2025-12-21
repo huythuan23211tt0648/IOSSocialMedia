@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+
 //
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
@@ -19,21 +20,24 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct IOSSocialMediaApp: App {
-    // register app delegate for Firebase setup
+    @StateObject var auth = AuthViewModel()
+
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
-//    init() {
-//            FirebaseApp.configure()
-//        }
+
     
     var body: some Scene {
         WindowGroup {
-
-
-
-//            ContentViewFireBase()
-            MainTabView()
-//            ProfileLoggedInView()
+            Group {
+                if (auth.isLoggedIn){
+                    MainTabView()
+                    
+                }else{
+                    NavigationView{
+                        LoginView()
+                    }
+                }
+            }.environmentObject(auth)
         }
     }
 }

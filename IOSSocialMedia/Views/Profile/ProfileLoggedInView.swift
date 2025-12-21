@@ -2,6 +2,10 @@ import SwiftUI
 
 struct ProfileLoggedInView: View {
     @State private var isDarkMode = false
+    @State private var isLogin = false
+    @State private var isMySelf = true
+    //    let user: User
+    
     var body: some View{
         // nen chinh
         ZStack{
@@ -16,13 +20,19 @@ struct ProfileLoggedInView: View {
                         ProfileHeaderView()
                         BioView()
                         FollowedByView()
-                        ActionButtonsView()
-                        HighlightView()
+                        
+                        if(isMySelf){
+                            ActionButtonsView()
+                        }else{
+                            ActionButtonsForMySelfView()
+                        }
+//                        HighlightView()
+                        
                         TabsView()
                         PhotoGridsView()
                     }.padding(20) // Padding dưới cùng để không bị che bởi tab bar
-                        
-                 
+                    
+                    
                 }
             }
         }.navigationTitle("") // Đặt title rỗng
@@ -32,18 +42,18 @@ struct ProfileLoggedInView: View {
     }
 }
 // MARK: - 1. HEADER
-struct HeaderView:View{
+private struct HeaderView:View{
     @Binding var isDarkMode :Bool
     var body: some View{
         HStack{
-            Image(systemName:"arrow.left").font(.title2)
+//            Image(systemName:"arrow.left").font(.title2)
             
             Spacer()
             
             //Nut Chuyen giao dien (Mặt trăng/ Mặt trời)
             Button(action: {isDarkMode.toggle()}){
                 Image(systemName: isDarkMode ? "moon.fill":"sun.max.fill").font(.title2).foregroundColor(.primary)
-             	
+                
             }
             Image(systemName:"ellipsis").font(.title2).padding(.leading,15)
         }.padding()
@@ -53,7 +63,7 @@ struct HeaderView:View{
 }
 
 // MARK: - 2. PROFILE INFO (Avatar + Số liệu)
-struct ProfileHeaderView :View {
+private struct ProfileHeaderView :View {
     var body: some View {
         HStack(alignment:.center,spacing: 20){
             //avatar
@@ -76,12 +86,12 @@ struct ProfileHeaderView :View {
             Spacer()
         }.padding(.horizontal)
         
-    
+        
     }
 }
 
 // Component con hiển thị số (Reusable Component)
-struct StatView:View {
+private struct StatView:View {
     let number : String
     let label : String
     var body: some View {
@@ -99,7 +109,7 @@ struct StatView:View {
 }
 
 // MARK: - 3. BIO (Tiểu sử)
-struct BioView:View {
+private struct BioView:View {
     var body: some View {
         VStack(alignment:.leading,spacing: 5){
             Text("Ai Mà biết được")
@@ -145,7 +155,7 @@ struct BioView:View {
 
 
 // MARK: - 4. FOLLOWED BY
-struct FollowedByView:View {
+private struct FollowedByView:View {
     var body: some View {
         HStack{
             // avatar chong len nhau
@@ -167,7 +177,7 @@ struct FollowedByView:View {
 }
 
 // MARK: - 5. ACTION BUTTONS
-struct ActionButtonsView : View {
+private struct ActionButtonsView : View {
     @State private var isFollowing = false
     var body: some View {
         HStack(spacing : 8){
@@ -184,27 +194,45 @@ struct ActionButtonsView : View {
                     .padding(.vertical ,8)
                 // Nếu đang theo dõi: Màu nền xám nhạt. Nếu chưa: Màu xanh
                     .background(isFollowing ? Color(UIColor.secondarySystemBackground) : Color.blue)
-                                    // Nếu đang theo dõi: Chữ đen/trắng (theo theme). Nếu chưa: Chữ trắng
+                // Nếu đang theo dõi: Chữ đen/trắng (theo theme). Nếu chưa: Chữ trắng
                     .foregroundColor(isFollowing ? .primary : .white)
                     .cornerRadius(8)
             }
             Button(action: {}) {
-                            Text("Nhắn tin")
-                                .font(.footnote)
-                                .fontWeight(.bold)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 9)
-                                .background(Color(UIColor.secondarySystemBackground)) // Xám nhạt
-                                .foregroundColor(.primary)
-                                .cornerRadius(8)
-                        }
+                Text("Nhắn tin")
+                    .font(.footnote)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 9)
+                    .background(Color(UIColor.secondarySystemBackground)) // Xám nhạt
+                    .foregroundColor(.primary)
+                    .cornerRadius(8)
+            }
             
         }
     }
 }
 
+// MARK: button for my profile
+private struct ActionButtonsForMySelfView:View {
+    var body: some View {
+        HStack(spacing :8){
+            Button(action:{}){
+                Text("Chỉnh sửa trang cá nhân")
+                    .font(.footnote)
+                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                    .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
+                    .padding(.vertical,9)
+                    .background(Color(UIColor.secondarySystemBackground))
+                    .foregroundColor(.primary)
+                    .cornerRadius(8)
+            }
+        }
+    }
+}
+
 // MARK: - 6. HIGHLIGHTS
-struct HighlightView:View {
+private struct HighlightView:View {
     let items = ["Link Áo 🕺", "Feedback🎯", "📦", "Q&A"]
     var body: some View {
         ScrollView(.horizontal,showsIndicators: false){
@@ -232,7 +260,7 @@ struct HighlightView:View {
 }
 
 // MARK: - 7. TABS
-struct TabsView:View {
+private struct TabsView:View {
     var body: some View {
         HStack(spacing : 0){
             VStack{
@@ -241,28 +269,28 @@ struct TabsView:View {
                 Rectangle().frame(height: 1).foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
                 
             }
-            .foregroundColor(.primary)
+            .foregroundColor(.blue)
             .frame(maxWidth: .infinity)
-//            VStack{
-//                Image(systemName: "play.rectangle")
-//                    .font(.title3)
-//                    .foregroundColor(.gray)
-//                Rectangle().frame(height: 1).foregroundColor(.clear)
-//            }
-//            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-//            VStack{
-//                Image(systemName: "person.crop.square")
-//                    .font(.title3)
-//                    .foregroundColor(.gray)
-//                Rectangle().frame(height: 1).foregroundColor(.clear)
-//            }
-//            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
+            //            VStack{
+            //                Image(systemName: "play.rectangle")
+            //                    .font(.title3)
+            //                    .foregroundColor(.gray)
+            //                Rectangle().frame(height: 1).foregroundColor(.clear)
+            //            }
+            //            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
+            //            VStack{
+            //                Image(systemName: "person.crop.square")
+            //                    .font(.title3)
+            //                    .foregroundColor(.gray)
+            //                Rectangle().frame(height: 1).foregroundColor(.clear)
+            //            }
+            //            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
         }
     }
 }
 
 // MARK: - 8. PHOTO GRID (Yêu cầu iOS 14+)
-struct PhotoGridsView:View {
+private struct PhotoGridsView:View {
     // Grid 3 cột, khoảng cách 1px
     let columns = [
         GridItem(.flexible(), spacing: 1),
@@ -270,16 +298,27 @@ struct PhotoGridsView:View {
         GridItem(.flexible(), spacing: 1)
     ]
     var body: some View {
-        LazyVGrid(columns : columns, spacing : 1){
-            ForEach(0..<15,id :\.self){ _ in
-            Rectangle()
+        LazyVGrid(columns: columns, spacing: 1) {
+            ForEach(0..<15, id: \.self) { _ in
+                Rectangle()
+                    // 1. Nền xám (Tự động đổi màu khi Dark Mode)
+                    // Light Mode: Xám nhạt | Dark Mode: Xám đậm
                     .fill(Color(UIColor.secondarySystemBackground))
-                    .aspectRatio(1 ,contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
+                    
+                    .aspectRatio(1, contentMode: .fill)
+                    
+                    // 2. Viền xanh dương nhạt (Dùng Stroke bên trong Overlay)
                     .overlay(
-                    Image(systemName: "play.fill")
-                        .foregroundColor(.white)
-                        .padding(5),
-                    alignment: .topTrailing
+                        Rectangle()
+                            .stroke(Color.blue.opacity(0.5), lineWidth: 1)
+                    )
+                    
+                    // 3. Icon Play (Giữ nguyên overlay cũ của bạn)
+                    .overlay(
+                        Image(systemName: "play.fill")
+                            .foregroundColor(.blue)
+                            .padding(5),
+                        alignment: .topTrailing
                     )
                     .clipped()
             }

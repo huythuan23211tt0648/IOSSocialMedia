@@ -3,6 +3,7 @@ import FirebaseAuth
 
 struct LoginView: View {
     @EnvironmentObject var auth: AuthViewModel
+    
     @State private var email = ""
     @State private var password = ""
     @State private var showPassword = false
@@ -190,8 +191,9 @@ struct LoginView: View {
 
 }
 
-//struct LoginView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        LoginView()
-//    }
-//}
+
+
+#Preview {
+    LoginView()
+        .environmentObject(AuthViewModel())
+}

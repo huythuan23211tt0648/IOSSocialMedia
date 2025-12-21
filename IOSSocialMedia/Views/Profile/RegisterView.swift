@@ -16,6 +16,9 @@ struct RegisterView: View {
     @State private var showSuccessAlert = false
 
     var body: some View {
+        ScrollView{
+            
+     
         ZStack {
             LinearGradient(colors: [.blue.opacity(0.9), .purple.opacity(0.8)],
                            startPoint: .topLeading,
@@ -186,6 +189,7 @@ struct RegisterView: View {
         }, message: {
             Text("Tài khoản đã được tạo. Bạn có thể đăng nhập và sử dụng ngay.")
         })
+        }
     }
 
     private var isRegisterDisabled: Bool {

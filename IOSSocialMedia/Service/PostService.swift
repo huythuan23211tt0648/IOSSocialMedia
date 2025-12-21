@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseFirestore
 
 struct PostService {
 
@@ -69,16 +70,6 @@ struct PostService {
         ])
     }
 
-    // MARK: - FETCH COMMENTS
-    static func fetchComments(postId: String) async throws -> [Comment] {
-        let snapshot = try await db.collection("posts")
-            .document(postId)
-            .collection("comments")
-            .order(by: "timestamp", descending: false)
-            .getDocuments()
 
-        return snapshot.documents.compactMap {
-            try? $0.data(as: Comment.self)
-        }
-    }
+  
 }

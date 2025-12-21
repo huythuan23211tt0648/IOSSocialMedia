@@ -49,6 +49,7 @@
 		EAB7C2582EEA69B700BF5D4A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EAB7C2572EEA69B700BF5D4A /* GoogleService-Info.plist */; };
 		EAE898982EEEE49800C0C6AD /* PostService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE898972EEEE49800C0C6AD /* PostService.swift */; };
 		EAE8989E2EEEEB0B00C0C6AD /* FireBaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE8989D2EEEEB0B00C0C6AD /* FireBaseModel.swift */; };
+		EAF10E7F2EF05DD9006B03EF /* MyProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF10E7E2EF05DD9006B03EF /* MyProfile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,7 @@
 		EAB7C2572EEA69B700BF5D4A /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		EAE898972EEEE49800C0C6AD /* PostService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostService.swift; sourceTree = "<group>"; };
 		EAE8989D2EEEEB0B00C0C6AD /* FireBaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireBaseModel.swift; sourceTree = "<group>"; };
+		EAF10E7E2EF05DD9006B03EF /* MyProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyProfile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -250,6 +252,7 @@
 				EA21A5CB2EE9B51600D83464 /* ProfileLoggedOutView.swift */,
 				EA21A5CC2EE9B51600D83464 /* ProfileView.swift */,
 				EA21A5CD2EE9B51600D83464 /* RegisterView.swift */,
+				EAF10E7E2EF05DD9006B03EF /* MyProfile.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -434,6 +437,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA21A5D12EE9B51600D83464 /* HomeView.swift in Sources */,
+				EAF10E7F2EF05DD9006B03EF /* MyProfile.swift in Sources */,
 				EA21A5D22EE9B51600D83464 /* ProfileView.swift in Sources */,
 				EA21A5D42EE9B51600D83464 /* ProfileLoggedInView.swift in Sources */,
 				EA21A5D52EE9B51600D83464 /* MessagesListView.swift in Sources */,

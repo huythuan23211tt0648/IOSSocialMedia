@@ -33,7 +33,7 @@ class AuthViewModel: ObservableObject {
             
             // Tạo model và lưu vào Firestore (DocumentID = uid)
             let appUser = User(id: user.uid,
-                                  name: name,
+                               username: name,
                                   email: email,
                                   createdAt: nil) // @ServerTimestamp sẽ được set trên server
             
