@@ -38,6 +38,8 @@ struct IOSSocialMediaApp: App {
                     }
                 }
             }.environmentObject(auth)
+//            MyPostsView()
+//            EditProfileView()
         }
     }
 }

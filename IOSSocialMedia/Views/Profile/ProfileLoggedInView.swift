@@ -1,92 +1,132 @@
 import SwiftUI
+import Firebase
+import FirebaseAuth
 
 struct ProfileLoggedInView: View {
     @State private var isDarkMode = false
-    @State private var isLogin = false
-    @State private var isMySelf = true
-    //    let user: User
     
-    var body: some View{
-        // nen chinh
-        ZStack{
-            // doi mau tu dong
+    // 1. Khởi tạo Service
+    @StateObject var userService = UserService()
+    
+    // 2. Giả sử PostService đã có sẵn (bạn inject vào hoặc khởi tạo mới)
+    @ObservedObject var postService = PostService.shared
+    
+    var body: some View {
+        ZStack {
             Color(.systemBackground).ignoresSafeArea()
             
-            //xep thanh hang ngang
-            VStack(spacing : 0 ){
-                HeaderView(isDarkMode:$isDarkMode)
-                ScrollView{
-                    VStack(alignment: .leading,spacing: 10                                   ){
-                        ProfileHeaderView()
-                        BioView()
-                        FollowedByView()
-                        
-                        if(isMySelf){
-                            ActionButtonsView()
-                        }else{
-                            ActionButtonsForMySelfView()
-                        }
-//                        HighlightView()
-                        
-                        TabsView()
-                        PhotoGridsView()
-                    }.padding(20) // Padding dưới cùng để không bị che bởi tab bar
+            if userService.isLoading {
+                ProgressView()
+            } else if let user = userService.currentUser {
+                // Đã có dữ liệu User -> Hiển thị giao diện
+                VStack(spacing: 0) {
+                    // Truyền username vào Header để hiển thị
+                    HeaderView(isDarkMode: $isDarkMode, username: user.username)
                     
-                    
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 10) {
+                            
+                            // Truyền User object xuống các View con
+                            ProfileHeaderView(user: user)
+                            BioView(user: user)
+                            FollowedByView()
+                            
+                            // Logic nút bấm dựa trên ID
+                            if user.id == Auth.auth().currentUser?.uid {
+                                ActionButtonsForMySelfView()
+                            } else {
+                                ActionButtonsView()
+                            }
+                            
+                            HighlightView()
+                            TabsView()
+                            
+                            // Truyền danh sách bài viết từ PostService vào Grid
+                            PhotoGridsView(posts: postService.posts)
+                            
+                        }.padding(20)
+                    }
+                    .refreshable {
+                        // Kéo để reload cả 2
+                        await userService.fetchCurrentUser()
+                        // Gọi hàm load post của service có sẵn (ví dụ: fetchPosts)
+                        if let uid = user.id {
+                                                    await PostService.shared.fetchUserPosts(uid: uid)
+                                                }
+                    }
                 }
+            } else {
+                // Trường hợp chưa load được hoặc lỗi
+                Text("Không thể tải thông tin cá nhân")
+                    .onAppear {
+                        Task { await userService.fetchCurrentUser() }
+                    }
             }
-        }.navigationTitle("") // Đặt title rỗng
-            .navigationBarHidden(true) // Ẩn luôn thanh bar hệ thống
-            .navigationBarBackButtonHidden(true) // Ẩn nút back mặc định nếu có
-            .preferredColorScheme(isDarkMode ? .dark : .light)
+        }
+        .navigationTitle("")
+        .navigationBarHidden(true)
+        .preferredColorScheme(isDarkMode ? .dark : .light)
+        .task {
+            // Tự động load dữ liệu khi vào màn hình
+            await userService.fetchCurrentUser()
+            if let uid = userService.currentUser?.id {
+                // Gọi service có sẵn của bạn
+                await PostService.shared.fetchUserPosts(uid: uid)
+            }
+        }
     }
 }
 // MARK: - 1. HEADER
-private struct HeaderView:View{
-    @Binding var isDarkMode :Bool
-    var body: some View{
-        HStack{
-//            Image(systemName:"arrow.left").font(.title2)
-            
+private struct HeaderView: View {
+    @Binding var isDarkMode: Bool
+    var username: String // Nhận tên user
+    
+    var body: some View {
+        HStack {
+            Text(username) // Hiển thị tên user trên thanh header
+                .font(.title2).fontWeight(.bold)
             Spacer()
-            
-            //Nut Chuyen giao dien (Mặt trăng/ Mặt trời)
-            Button(action: {isDarkMode.toggle()}){
-                Image(systemName: isDarkMode ? "moon.fill":"sun.max.fill").font(.title2).foregroundColor(.primary)
-                
+            Button(action: { isDarkMode.toggle() }) {
+                Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
+                    .font(.title2).foregroundColor(.primary)
             }
-            Image(systemName:"ellipsis").font(.title2).padding(.leading,15)
-        }.padding()
-            .foregroundColor(.primary)
-            .background(Color(UIColor.systemBackground))
+            Image(systemName: "line.3.horizontal")
+                .font(.title2).padding(.leading, 15)
+        }
+        .padding()
+        .background(Color(UIColor.systemBackground))
     }
 }
 
 // MARK: - 2. PROFILE INFO (Avatar + Số liệu)
-private struct ProfileHeaderView :View {
+private struct ProfileHeaderView: View {
+    let user: User // Nhận model User
+    
     var body: some View {
-        HStack(alignment:.center,spacing: 20){
-            //avatar
-            Image(systemName:"cat.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 85,height: 85)
-                .clipShape(Circle())
-                .foregroundColor(.primary)
-                .overlay(Circle().stroke(Color.gray,lineWidth: 0.5))
+        HStack(alignment: .center, spacing: 20) {
+            // Avatar
+            if let base64String = user.profileImageUrl, !base64String.isEmpty {
+                Base64ImageView(base64String: base64String)
+                    .frame(width: 90, height: 90)
+                    .clipShape(Circle())
+            
+            } else {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .frame(width: 85, height: 85)
+                    .foregroundColor(.gray)
+            }
             
             Spacer()
             
-            //Stats
-            HStack(spacing:20){
-                StatView(number:"970",label:"bài viết")
-                StatView(number: "158K", label: "người theo dõi")
-                StatView(number: "0", label: "đang theo dõi")
+            // Stats (Dùng dữ liệu thật từ model)
+            HStack(spacing: 20) {
+                StatView(number: "\(user.postsCount)", label: "bài viết")
+                StatView(number: "\(user.followersCount)", label: "người theo dõi")
+                StatView(number: "\(user.followingCount)", label: "đang theo dõi")
             }
             Spacer()
         }.padding(.horizontal)
-        
-        
     }
 }
 
@@ -109,50 +149,57 @@ private struct StatView:View {
 }
 
 // MARK: - 3. BIO (Tiểu sử)
-private struct BioView:View {
+private struct BioView: View {
+    let user: User
+    
     var body: some View {
-        VStack(alignment:.leading,spacing: 5){
-            Text("Ai Mà biết được")
-                .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+        VStack(alignment: .leading, spacing: 5) {
+            // Tên hiển thị
+            Text(user.username) // Hoặc tên thật nếu bạn có field fullName
+                .fontWeight(.bold)
                 .foregroundColor(.primary)
-            Text("Trang giai tri")
-                .foregroundColor(.gray)
             
-            Group{
-                Text("The Vietnamese Culture on Instagram 🇻🇳")
-                Text("Welcome to the culture 🙌")
-            }.foregroundColor(.primary)
-            
-            Text("Xem ban dich")
-                .font(.caption)
-                .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
-                .foregroundColor(.primary)
-            HStack(spacing:5){
-                Image(systemName:"link")
+            // Danh xưng (Pronouns)
+            if let pronouns = user.pronouns, !pronouns.isEmpty {
+                Text(pronouns)
                     .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            
+            // Tiểu sử
+            if let bio = user.bio, !bio.isEmpty {
+                Text(bio)
                     .foregroundColor(.primary)
-                Text("Shoppe.vn")
-                    .foregroundColor(Color(UIColor.systemBlue))
             }
             
-            //threads bage
-            HStack{
-                Image(systemName:"at")
-                    .font(.caption)
-                Text("dong.vn")
-                    .font(.caption)
+            // Website Link
+            if let website = user.socialLinks?.website, !website.isEmpty {
+                HStack(spacing: 5) {
+                    Image(systemName: "link").font(.caption)
+                    Link(destination: URL(string: website) ?? URL(string: "https://google.com")!) {
+                        Text(website)
+                            .foregroundColor(Color(UIColor.systemBlue))
+                            .lineLimit(1)
+                    }
+                }
             }
-            .padding(6)
-            .background(Color(UIColor.secondarySystemBackground))
-            .clipShape(Capsule())
-            .foregroundColor(.primary)
             
+            // Threads Link (Badge)
+            if let threads = user.socialLinks?.threads, !threads.isEmpty {
+                HStack {
+                    Image(systemName: "at").font(.caption)
+                    Text(threads).font(.caption)
+                }
+                .padding(6)
+                .background(Color(UIColor.secondarySystemBackground))
+                .clipShape(Capsule())
+                .padding(.top, 4)
+            }
         }
         .padding(.horizontal)
         .font(.subheadline)
     }
 }
-
 
 // MARK: - 4. FOLLOWED BY
 private struct FollowedByView:View {
@@ -215,9 +262,12 @@ private struct ActionButtonsView : View {
 
 // MARK: button for my profile
 private struct ActionButtonsForMySelfView:View {
+    @State private var showEditProfile = false
     var body: some View {
         HStack(spacing :8){
-            Button(action:{}){
+            Button(action:{
+                showEditProfile = true
+            }){
                 Text("Chỉnh sửa trang cá nhân")
                     .font(.footnote)
                     .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
@@ -228,6 +278,10 @@ private struct ActionButtonsForMySelfView:View {
                     .cornerRadius(8)
             }
         }
+        // 3. Gắn sheet vào View cha
+                    .sheet(isPresented: $showEditProfile) {
+                        EditProfileView() // Gọi View chỉnh sửa tại đây
+                    }
     }
 }
 
@@ -245,7 +299,7 @@ private struct HighlightView:View {
                             .overlay(
                                 Circle().stroke(Color(uiColor: .separator),lineWidth: 1)
                             )
-                            .overlay(Image(systemName: "Photo")
+                            .overlay(Image(systemName: "photo")
                                 .foregroundColor(.primary))
                         Text(item)
                             .font(.caption)
@@ -289,47 +343,62 @@ private struct TabsView:View {
     }
 }
 
-// MARK: - 8. PHOTO GRID (Yêu cầu iOS 14+)
-private struct PhotoGridsView:View {
-    // Grid 3 cột, khoảng cách 1px
+
+// MARK: - 8. PHOTO GRID (Updated for Base64)
+private struct PhotoGridsView: View {
+    let posts: [Post]
+    
+    // Cấu hình Grid 3 cột, khoảng cách 1px
     let columns = [
         GridItem(.flexible(), spacing: 1),
         GridItem(.flexible(), spacing: 1),
         GridItem(.flexible(), spacing: 1)
     ]
+    
     var body: some View {
         LazyVGrid(columns: columns, spacing: 1) {
-            ForEach(0..<15, id: \.self) { _ in
-                Rectangle()
-                    // 1. Nền xám (Tự động đổi màu khi Dark Mode)
-                    // Light Mode: Xám nhạt | Dark Mode: Xám đậm
-                    .fill(Color(UIColor.secondarySystemBackground))
+            ForEach(posts) { post in
+                // Logic: Lấy chuỗi ảnh đầu tiên trong mảng
+                if let firstBase64String = post.imageUrls.first {
                     
-                    .aspectRatio(1, contentMode: .fill)
-                    
-                    // 2. Viền xanh dương nhạt (Dùng Stroke bên trong Overlay)
-                    .overlay(
-                        Rectangle()
-                            .stroke(Color.blue.opacity(0.5), lineWidth: 1)
-                    )
-                    
-                    // 3. Icon Play (Giữ nguyên overlay cũ của bạn)
-                    .overlay(
-                        Image(systemName: "play.fill")
-                            .foregroundColor(.blue)
-                            .padding(5),
-                        alignment: .topTrailing
-                    )
-                    .clipped()
+                    // 👇 SỬA Ở ĐÂY: Bao bọc hình ảnh bên trong NavigationLink
+                    // Lưu ý: Dùng `destination:` và mở ngoặc nhọn `{`
+                    NavigationLink(destination: MyPostsView(
+                        uid: Auth.auth().currentUser?.uid ?? "",
+                        scrollToPostId: post.id // 👈 Truyền ID bài viết vào đây
+                    )) {
+                        
+                        GeometryReader { geo in
+                            // Gọi Component hiển thị Base64 đã tạo ở trên
+                            Base64ImageView(base64String: firstBase64String)
+                                .scaledToFill() // Fill đầy ô vuông
+                                .frame(width: geo.size.width, height: geo.size.width) // Ép size vuông theo chiều rộng cột
+                                .clipped() // Cắt phần thừa
+                        }
+                        .aspectRatio(1, contentMode: .fit) // Giữ khung hình vuông
+                        .overlay(
+                            // Logic: Nếu có nhiều hơn 1 ảnh thì hiện icon "Nhiều lớp"
+                            Group {
+                                if post.imageUrls.count > 1 {
+                                    Image(systemName: "square.fill.on.square.fill")
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                        .padding(8)
+                                        .shadow(radius: 2)
+                                }
+                            },
+                            alignment: .topTrailing
+                        )
+                        
+                    } // 👆 Đóng ngoặc NavigationLink tại đây
+                }
             }
         }
     }
 }
 
-
-
-struct ProfileLoggedInView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProfileLoggedInView()
-    }
-}
+//struct ProfileLoggedInView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ProfileLoggedInView()
+//    }
+//}

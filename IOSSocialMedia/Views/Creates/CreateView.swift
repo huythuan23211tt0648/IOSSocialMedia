@@ -1,40 +1,47 @@
 import SwiftUI
 
+import SwiftUI
+
 struct CreatePostView: View {
     // --- STATE ---
-    @State private var selectedImage: UIImage? = nil
+    // 👇 Sửa thành mảng ảnh để chứa nhiều ảnh
+    @State private var selectedImages: [UIImage] = []
+    
     @State private var caption: String = ""
     @State private var showImagePicker = false
+    @State private var isLoading = false
+    
+    // Alert state
+    @State private var showError = false
+    @State private var errorMessage = ""
     
     // Quản lý Focus và Dismiss
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) var presentationMode
     
-    // Fix lỗi nền TextEditor
     init() {
         UITextView.appearance().backgroundColor = .clear
     }
     
     var body: some View {
-        // ❌ KHÔNG DÙNG NavigationView nữa
-        // ✅ Dùng VStack để tự xếp layout
         VStack(spacing: 0) {
             
-            // 1. GỌI CUSTOM HEADER (Thay cho .toolbar)
+            // 1. HEADER
             CustomToolbarView(
                 onCancel: { presentationMode.wrappedValue.dismiss() },
                 onPost: { handlePost() },
-                canPost: selectedImage != nil // Chỉ cho post khi có ảnh
+                // Chỉ cho post khi có ít nhất 1 ảnh
+                canPost: !selectedImages.isEmpty
             )
             
-            Divider() // Đường kẻ ngăn cách header
+            Divider()
             
-            // 2. NỘI DUNG CHÍNH (Cuộn được)
+            // 2. NỘI DUNG CHÍNH
             ScrollView {
                 VStack(spacing: 24) {
-                    // View con chọn ảnh
+                    // View con hiển thị ảnh (đã chọn)
                     PostImagePickerView(
-                        selectedImage: selectedImage,
+                        selectedImages: selectedImages,
                         showImagePicker: $showImagePicker
                     )
                     
@@ -49,16 +56,54 @@ struct CreatePostView: View {
                 .padding()
             }
         }
-        .background(Color(.systemBackground)) // Đảm bảo nền không trong suốt
-        // Sheet chọn ảnh (Vẫn cần thiết)
+        .background(Color(.systemBackground))
+        // 👇 Gọi ImagePicker hỗ trợ NHIỀU ẢNH
         .sheet(isPresented: $showImagePicker) {
-            ImagePicker(selectedImage: $selectedImage)
+            // limit: 0 là không giới hạn, 5 là tối đa 5 ảnh
+            UniversalImagePicker(selectedImages: $selectedImages, limit: 5)
+        }
+        // Loading Overlay
+        .overlay {
+            if isLoading {
+                ZStack {
+                    Color.black.opacity(0.4).ignoresSafeArea()
+                    ProgressView("Đang đăng...")
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(10)
+                }
+            }
+        }
+        // Alert Báo lỗi
+        .alert("Lỗi", isPresented: $showError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
         }
     }
     
+    // HÀM UPLOAD POST (Hỗ trợ nhiều ảnh)
     func handlePost() {
-        print("Đang đăng bài...")
-        presentationMode.wrappedValue.dismiss()
+        // Kiểm tra mảng rỗng
+        guard !selectedImages.isEmpty else { return }
+        
+        isLoading = true
+        
+        Task {
+            do {
+                // 👇 Cần sửa PostService để nhận mảng [UIImage]
+                // Tạm thời loop qua để upload ảnh đầu tiên (demo)
+                // Hoặc bạn phải update PostService.uploadPost nhận [UIImage]
+                try await PostService.shared.uploadPost(caption: caption, images: selectedImages)
+                
+                isLoading = false
+                presentationMode.wrappedValue.dismiss()
+            } catch {
+                isLoading = false
+                errorMessage = error.localizedDescription
+                showError = true
+            }
+        }
     }
 }
 
@@ -103,30 +148,41 @@ struct CustomToolbarView: View {
 
 // MARK: - 2. VIEW CON: CHỌN ẢNH
 struct PostImagePickerView: View {
-    let selectedImage: UIImage?
+    let selectedImages: [UIImage] // Nhận mảng ảnh
     @Binding var showImagePicker: Bool
     
     var body: some View {
-        if let uiImage = selectedImage {
+        if !selectedImages.isEmpty {
+            // TRƯỜNG HỢP: Đã chọn ảnh -> Hiện Slider lướt ngang
             ZStack(alignment: .topTrailing) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(height: 350)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .clipped()
                 
+                TabView {
+                    ForEach(0..<selectedImages.count, id: \.self) { index in
+                        Image(uiImage: selectedImages[index])
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 350)
+                            .clipped()
+                            // 👇 Tag quan trọng để TabView chạy đúng
+                            .tag(index)
+                    }
+                }
+                .tabViewStyle(PageTabViewStyle()) // Hiện dấu chấm tròn
+                .frame(height: 350)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                
+                // Nút Sửa ảnh (Góc trên phải)
                 Button(action: { showImagePicker = true }) {
                     Image(systemName: "pencil.circle.fill")
-                        .renderingMode(.original)
                         .font(.system(size: 30))
                         .foregroundColor(.blue)
                         .background(Color.white.clipShape(Circle()))
                         .shadow(radius: 2)
-                        .padding(8)
+                        .padding(10)
                 }
             }
         } else {
+            // TRƯỜNG HỢP: Chưa chọn ảnh -> Hiện nút thêm
             Button(action: { showImagePicker = true }) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
@@ -139,10 +195,10 @@ struct PostImagePickerView: View {
                         .frame(height: 250)
                     
                     VStack(spacing: 12) {
-                        Image(systemName: "photo.badge.plus")
+                        Image(systemName: "photo.on.rectangle")
                             .font(.system(size: 44))
                             .foregroundColor(.blue)
-                        Text("Nhấn để thêm ảnh")
+                        Text("Nhấn để chọn ảnh")
                             .font(.headline)
                             .foregroundColor(.gray)
                     }
@@ -183,9 +239,9 @@ struct PostCaptionInputView: View {
     }
 }
 
-// Preview
-struct CreatePostView_Previews: PreviewProvider {
-    static var previews: some View {
-        CreatePostView()
-    }
-}
+//// Preview
+//struct CreatePostView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CreatePostView()
+//    }
+//}

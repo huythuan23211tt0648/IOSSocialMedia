@@ -8,87 +8,216 @@
 import Foundation
 import Firebase
 import FirebaseFirestore
+import FirebaseFirestoreSwift
+import FirebaseAuth
+import UIKit
 
-struct PostService {
+class PostService:ObservableObject {
 
     static let db = Firestore.firestore()
-
+     let uid = Auth.auth().currentUser?.uid
+    
+    let db = Firestore.firestore()
+    // Singleton để gọi ở đâu cũng được
+        static let shared = PostService()
+    @Published var posts: [Post] = []
+    
+    //MARK: CREATE POST
+    func uploadPost(caption: String, images: [UIImage]) async throws{
+        // 1. Kiểm tra User ID
+        guard let uid = Auth.auth().currentUser?.uid else {return
+        }
+   
+        // Convert tất cả ảnh sang Base64
+            var base64Strings: [String] = []
+            
+            for image in images {
+                if let imageData = image.jpegData(compressionQuality: 0.2) {
+                    let str = imageData.base64EncodedString()
+                    base64Strings.append(str)
+                }
+            }
+        // lay thong tin user
+        // 3. Lấy thông tin User hiện tại (để lưu tên/avatar người đăng vào bài viết)
+                let userSnapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
+                let userData = userSnapshot.data() ?? [:]
+        print("datauser" , userData)
+        let userName = userData["username"] as? String ??  "unknow"
+//        let profileImageURL = userData["profileImageURL"] as? String
+        
+        let post = Post(ownerUid: uid, ownerUsername: userName, caption: caption, imageUrls: base64Strings, likesCount: 0, commentsCount: 0)
+        
+        try _ = Firestore.firestore().collection("posts").addDocument(from: post)
+        print("Tạo bài viết thành công")
+        
+    }
+    //MARK: GET LIST POST
+    func fetchAllPosts() async throws -> [Post]{
+        let snapshot  = try await Firestore.firestore().collection("posts").order(by: "timestamp", descending: true).getDocuments()
+        
+        //map từ document -> oject post
+        return snapshot.documents.compactMap({try? $0.data(as: Post.self)})
+    }
+    
+    //MARK: GET LIST POST BY USER_ID
+    func fetchUserPosts(uid: String) async {
+            do {
+                let snapshot = try await db.collection("posts")
+                    .whereField("owner_uid", isEqualTo: uid)
+                    .order(by: "timestamp", descending: true)
+                    .getDocuments()
+                
+                let fetchedPosts = snapshot.documents.compactMap({ try? $0.data(as: Post.self) })
+                
+                // Cập nhật lên UI (Bắt buộc chạy trên Main Thread)
+                await MainActor.run {
+                    self.posts = fetchedPosts
+                    print("Đã tải \(self.posts.count) bài viết cho user \(uid)")
+                }
+            } catch {
+                print("Lỗi tải bài viết: \(error.localizedDescription)")
+            }
+        }
+    
+    
     // MARK: - LIKE / UNLIKE
-    static func likePost(
-        post: Post,
-        uid: String,
-        username: String
+    func likePost(
+        post: Post
+       
     ) async throws {
-
+        guard let uid = Auth.auth().currentUser?.uid else {return
+        }
         guard let postId = post.id else { return }
-
-        let db = Firestore.firestore()
+        // Ở đây mình ví dụ lấy tạm username từ Auth (nếu có updateDisplayName)
+                let username = Auth.auth().currentUser?.displayName ?? "User"
         let postRef = db.collection("posts").document(postId)
         let likeRef = postRef.collection("likes").document(uid)
 
         try await db.runTransaction { transaction, errorPointer in
+                    let likeSnapshot: DocumentSnapshot
+                    do {
+                        likeSnapshot = try transaction.getDocument(likeRef)
+                    } catch let error as NSError {
+                        errorPointer?.pointee = error
+                        return nil
+                    }
 
-            let likeSnapshot: DocumentSnapshot
-            do {
-                likeSnapshot = try transaction.getDocument(likeRef)
-            } catch let error as NSError {
-                errorPointer?.pointee = error
-                return nil
+                    if likeSnapshot.exists {
+                        // UNLIKE
+                        transaction.deleteDocument(likeRef)
+                        transaction.updateData(["likes_count": FieldValue.increment(Int64(-1))], forDocument: postRef)
+                    } else {
+                        // LIKE
+                        transaction.setData([
+                            "uid": uid,
+                            "username": username,
+                            "timestamp": FieldValue.serverTimestamp()
+                        ], forDocument: likeRef)
+                        
+                        transaction.updateData(["likes_count": FieldValue.increment(Int64(1))], forDocument: postRef)
+                    }
+                    return nil
+                }
+    }
+    
+    // MARK: - CHECK IF USER LIKED POST
+        func checkIfUserLikedPost(postId: String) async throws -> Bool {
+            guard let uid = Auth.auth().currentUser?.uid else { return false }
+            
+            // Kiểm tra xem trong sub-collection "likes" có document tên là UID của mình không
+            let snapshot = try await Firestore.firestore()
+                .collection("posts")
+                .document(postId)
+                .collection("likes")
+                .document(uid)
+                .getDocument()
+            
+            return snapshot.exists
+        }
+
+
+    // MARK: - ADD COMMENT (Dùng Batch Write)
+        func addComment(postId: String, content: String) async throws {
+            
+            // 1. Kiểm tra đăng nhập
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            
+            // 2. Lấy thông tin user hiện tại để gắn vào comment
+            // (Lưu ý: Việc gọi fetch user ở đây sẽ làm chậm comment 1 chút, tốt nhất nên truyền User từ bên ngoài vào nếu có thể)
+            let userSnapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
+            let userData = userSnapshot.data() ?? [:]
+            
+            let userName = userData["username"] as? String ?? "Unknown"
+             let profileImageUrl = userData["profile_image_url"] as? String // Nếu muốn lấy avatar
+            
+            // 3. Tạo Object Comment
+            let newComment = Comment(
+                uid: uid,
+                username: userName,
+                content: content,
+                profileImageUrl: profileImageUrl, // Hoặc điền profileImageUrl lấy ở trên
+                likeCount: 0,
+                timestamp: nil // Firestore sẽ tự điền serverTimestamp
+            )
+            
+            // 4. Chuẩn bị Batch
+            let postRef = db.collection("posts").document(postId)
+            let newCommentRef = postRef.collection("comments").document() // Tạo ID mới
+            
+            let batch = db.batch()
+            
+            // 👇 SỬA LỖI Ở ĐÂY: Dùng biến 'newComment' chứ không phải kiểu 'Comment'
+            try batch.setData(from: newComment, forDocument: newCommentRef)
+            
+            // Tăng đếm comment
+            batch.updateData(["comments_count": FieldValue.increment(Int64(1))], forDocument: postRef)
+            
+            // 5. Gửi lên Server
+            try await batch.commit()
+            
+            print("✅ Đã thêm comment thành công!")
+        }
+    
+    
+    
+    
+    // MARK: - DELETE POST (Dùng Batch Write - Quan trọng)
+        func deletePost(postId: String) async throws {
+            let postRef = db.collection("posts").document(postId)
+            let batch = db.batch() // Tạo gói lệnh
+            
+            // 1. Lấy tất cả Likes để xóa
+            let likesSnapshot = try await postRef.collection("likes").getDocuments()
+            for doc in likesSnapshot.documents {
+                batch.deleteDocument(doc.reference) // Thêm lệnh xóa vào gói
             }
-
-            if likeSnapshot.exists {
-                // UNLIKE
-                transaction.deleteDocument(likeRef)
-                transaction.updateData([
-                    "likes_count": FieldValue.increment(Int64(-1))
-                ], forDocument: postRef)
-            } else {
-                // LIKE
-                transaction.setData([
-                    "uid": uid,
-                    "username": username,
-                    "timestamp": FieldValue.serverTimestamp()
-                ], forDocument: likeRef)
-
-                transaction.updateData([
-                    "likes_count": FieldValue.increment(Int64(1))
-                ], forDocument: postRef)
+            
+            // 2. Lấy tất cả Comments để xóa
+            let commentsSnapshot = try await postRef.collection("comments").getDocuments()
+            for doc in commentsSnapshot.documents {
+                batch.deleteDocument(doc.reference) // Thêm lệnh xóa vào gói
             }
-
-            return nil
+            
+            // 3. Xóa bài viết chính
+            batch.deleteDocument(postRef)
+            
+            // 4. Gửi 1 lần duy nhất lên Server
+            try await batch.commit()
+            
+            print("Đã xóa bài viết và toàn bộ dữ liệu liên quan.")
         }
-    }
-
-
-    // MARK: - ADD COMMENT
-    static func addComment(postId: String, comment: Comment) async throws {
-        let postRef = db.collection("posts").document(postId)
-
-        try await postRef.collection("comments").addDocument(from: comment)
-        try await postRef.updateData([
-            "comments_count": FieldValue.increment(Int64(1))
-        ])
+    
+//    MARK: FETCH COMMENTS
+    func fetchComments(postId:String) async throws -> [Comment]{
+        let snapshot = try await db.collection("posts")
+            .document(postId)
+            .collection("comments")
+            .order(by: "timestamp", descending: true) // Sắp xếp: Mới nhất lên đầu
+            .getDocuments()
+        
+        // Map dữ liệu từ Firestore sang mảng [Comment]
+                return snapshot.documents.compactMap({ try? $0.data(as: Comment.self) })
     }
     
     
-    
-    // MARK: - DELETE POST
-    func deletePost(postId: String) async throws {
-        let postRef = PostService.db.collection("posts").document(postId)
-        
-        // Xóa tất cả sub-collections (likes, comments)
-        // Lưu ý: Firestore không tự động xóa sub-collections, cần xóa thủ công
-        let likesSnapshot = try await postRef.collection("likes").getDocuments()
-        for likeDoc in likesSnapshot.documents {
-            try await likeDoc.reference.delete()
-        }
-        
-        let commentsSnapshot = try await postRef.collection("comments").getDocuments()
-        for commentDoc in commentsSnapshot.documents {
-            try await commentDoc.reference.delete()
-        }
-        
-        // Xóa post chính
-        try await postRef.delete()
-    }
 }

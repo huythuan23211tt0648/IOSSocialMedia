@@ -34,6 +34,7 @@ struct MainTabView: View {
             NavigationView {
                 CreatePostView()
                     .navigationTitle("Create")
+                    .navigationBarHidden(true)
             }
             .tabItem {
                 Image(systemName: "plus.square")

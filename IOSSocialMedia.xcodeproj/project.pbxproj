@@ -31,6 +31,7 @@
 		EA21A5DA2EE9B51600D83464 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5CD2EE9B51600D83464 /* RegisterView.swift */; };
 		EA21A5DB2EE9B51600D83464 /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5C52EE9B51600D83464 /* ChatBubble.swift */; };
 		EA21A5DE2EE9B91900D83464 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21A5DD2EE9B91500D83464 /* MainTabView.swift */; };
+		EA4D6F992EF954E40003CFBD /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4D6F982EF954E40003CFBD /* EditProfileView.swift */; };
 		EA609BA22EEC3CFB00552803 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = EA609BA12EEC3CFB00552803 /* FirebaseAuth */; };
 		EA609BA42EEC3CFB00552803 /* FirebaseAuthCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = EA609BA32EEC3CFB00552803 /* FirebaseAuthCombine-Community */; };
 		EA609BA62EEC3CFB00552803 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = EA609BA52EEC3CFB00552803 /* FirebaseDatabase */; };
@@ -47,6 +48,9 @@
 		EA9C86212EEC6A6200446181 /* TodoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9C86202EEC6A6200446181 /* TodoViewModel.swift */; };
 		EAA51B252EEAC15900296924 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA51B242EEAC15900296924 /* TodoItem.swift */; };
 		EAA51B2B2EEAC22800296924 /* ContentViewFireBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA51B2A2EEAC22000296924 /* ContentViewFireBase.swift */; };
+		EAA658E32EF8672B000DF4EB /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA658E22EF8672B000DF4EB /* HomeViewModel.swift */; };
+		EAB60FFD2EF8D641004B9A84 /* CommentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB60FFC2EF8D641004B9A84 /* CommentViewModel.swift */; };
+		EAB60FFF2EF8E737004B9A84 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB60FFE2EF8E737004B9A84 /* UserService.swift */; };
 		EAB7C2582EEA69B700BF5D4A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EAB7C2572EEA69B700BF5D4A /* GoogleService-Info.plist */; };
 		EAE898982EEEE49800C0C6AD /* PostService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE898972EEEE49800C0C6AD /* PostService.swift */; };
 		EAE8989E2EEEEB0B00C0C6AD /* FireBaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE8989D2EEEEB0B00C0C6AD /* FireBaseModel.swift */; };
@@ -98,9 +102,13 @@
 		EA21A5CC2EE9B51600D83464 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		EA21A5CD2EE9B51600D83464 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		EA21A5DD2EE9B91500D83464 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		EA4D6F982EF954E40003CFBD /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
 		EA9C86202EEC6A6200446181 /* TodoViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TodoViewModel.swift; sourceTree = "<group>"; };
 		EAA51B242EEAC15900296924 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 		EAA51B2A2EEAC22000296924 /* ContentViewFireBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewFireBase.swift; sourceTree = "<group>"; };
+		EAA658E22EF8672B000DF4EB /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		EAB60FFC2EF8D641004B9A84 /* CommentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentViewModel.swift; sourceTree = "<group>"; };
+		EAB60FFE2EF8E737004B9A84 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
 		EAB7C2572EEA69B700BF5D4A /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		EAE898972EEEE49800C0C6AD /* PostService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostService.swift; sourceTree = "<group>"; };
 		EAE8989D2EEEEB0B00C0C6AD /* FireBaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireBaseModel.swift; sourceTree = "<group>"; };
@@ -263,6 +271,7 @@
 				EA21A5CC2EE9B51600D83464 /* ProfileView.swift */,
 				EA21A5CD2EE9B51600D83464 /* RegisterView.swift */,
 				EAF10E7E2EF05DD9006B03EF /* MyProfile.swift */,
+				EA4D6F982EF954E40003CFBD /* EditProfileView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -285,6 +294,8 @@
 			children = (
 				EA21A5B82EE9B50800D83464 /* AuthViewModel.swift */,
 				EA9C86202EEC6A6200446181 /* TodoViewModel.swift */,
+				EAA658E22EF8672B000DF4EB /* HomeViewModel.swift */,
+				EAB60FFC2EF8D641004B9A84 /* CommentViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -293,6 +304,7 @@
 			isa = PBXGroup;
 			children = (
 				EAE898972EEEE49800C0C6AD /* PostService.swift */,
+				EAB60FFE2EF8E737004B9A84 /* UserService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -449,7 +461,9 @@
 			files = (
 				EA21A5D12EE9B51600D83464 /* HomeView.swift in Sources */,
 				EAF10E7F2EF05DD9006B03EF /* MyProfile.swift in Sources */,
+				EAB60FFF2EF8E737004B9A84 /* UserService.swift in Sources */,
 				EA21A5D22EE9B51600D83464 /* ProfileView.swift in Sources */,
+				EAA658E32EF8672B000DF4EB /* HomeViewModel.swift in Sources */,
 				EA21A5D42EE9B51600D83464 /* ProfileLoggedInView.swift in Sources */,
 				EA21A5D52EE9B51600D83464 /* MessagesListView.swift in Sources */,
 				EA21A5D62EE9B51600D83464 /* ProfileLoggedOutView.swift in Sources */,
@@ -459,9 +473,11 @@
 				A02E99B72EF0313E00679C03 /* User.swift in Sources */,
 				EA9C86212EEC6A6200446181 /* TodoViewModel.swift in Sources */,
 				EA21A5DA2EE9B51600D83464 /* RegisterView.swift in Sources */,
+				EA4D6F992EF954E40003CFBD /* EditProfileView.swift in Sources */,
 				EAA51B2B2EEAC22800296924 /* ContentViewFireBase.swift in Sources */,
 				EA21A5DB2EE9B51600D83464 /* ChatBubble.swift in Sources */,
 				EA21A5DE2EE9B91900D83464 /* MainTabView.swift in Sources */,
+				EAB60FFD2EF8D641004B9A84 /* CommentViewModel.swift in Sources */,
 				CE915B132EF1328400DE5D1C /* MyPostsView.swift in Sources */,
 				EAA51B252EEAC15900296924 /* TodoItem.swift in Sources */,
 				EAE8989E2EEEEB0B00C0C6AD /* FireBaseModel.swift in Sources */,
