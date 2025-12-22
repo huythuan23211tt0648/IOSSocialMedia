@@ -49,61 +49,93 @@ class UserService: ObservableObject {
             username: String,
             bio: String,
             pronouns: String,
-            links: [LinkItem], // Nhận danh sách link từ View
-            newImage: UIImage? // Ảnh mới (nếu có)
+            links: [LinkItem],
+            newImage: UIImage?
         ) async throws {
             
             guard let uid = Auth.auth().currentUser?.uid else { return }
             
-            // 1. Tạo Dictionary chứa dữ liệu cần update
-            var data: [String: Any] = [
+            // --- BƯỚC 1: CHUẨN BỊ DỮ LIỆU USER ---
+            var userData: [String: Any] = [
                 "username": username,
                 "bio": bio,
                 "pronouns": pronouns,
-                // Cập nhật thời gian sửa đổi nếu cần
                 "updated_at": FieldValue.serverTimestamp()
             ]
             
-            // 2. Xử lý ảnh: Chuyển UIImage -> Base64 String
-            // Lưu ý: Firestore giới hạn document 1MB. Ảnh Base64 rất nặng.
-            // Nên nén mạnh (0.1 - 0.3) để tránh lỗi quá dung lượng.
+            // Biến lưu ảnh mới (nếu có) để dùng update Post và Comment
+            var newProfileImageUrl: String? = nil
+            
             if let image = newImage,
-               let imageData = image.jpegData(compressionQuality: 0.2) { // Nén 0.2
+               let resizedImage = image.resized(toWidth: 300),
+               let imageData = resizedImage.jpegData(compressionQuality: 0.5) {
                 
                 let base64String = imageData.base64EncodedString()
-                
-                // Key phải khớp với CodingKeys trong Model: "profile_image_url"
-                data["profile_image_url"] = base64String
+                userData["profile_image_url"] = base64String
+                newProfileImageUrl = base64String
             }
             
-            // 3. Xử lý Links: Map từ [LinkItem] -> Dictionary của SocialLinks
+            // Xử lý Links
             var socialLinksData: [String: String] = [:]
-            
             for link in links {
-                // Logic đơn giản để phân loại link dựa trên Tiêu đề hoặc URL
                 let lowerTitle = link.title.lowercased()
-                
-                if lowerTitle.contains("facebook") {
-                    socialLinksData["facebook"] = link.url
-                } else if lowerTitle.contains("threads") {
-                    socialLinksData["threads"] = link.url
-                } else if lowerTitle.contains("youtube") {
-                    socialLinksData["youtube"] = link.url
-                } else {
-                    // Mặc định cho vào website nếu không khớp cái nào
-                    socialLinksData["website"] = link.url
-                }
+                if lowerTitle.contains("facebook") { socialLinksData["facebook"] = link.url }
+                else if lowerTitle.contains("threads") { socialLinksData["threads"] = link.url }
+                else if lowerTitle.contains("youtube") { socialLinksData["youtube"] = link.url }
+                else { socialLinksData["website"] = link.url }
             }
-            
-            // Key khớp CodingKeys: "social_links"
             if !socialLinksData.isEmpty {
-                data["social_links"] = socialLinksData
+                userData["social_links"] = socialLinksData
             }
             
-            // 4. Gửi lên Firestore
-            try await db.collection("users").document(uid).updateData(data)
+            // --- BƯỚC 2: KHỞI TẠO BATCH ---
+            let batch = db.batch()
             
-            // 5. Cập nhật lại dữ liệu local (currentUser) để UI đổi ngay lập tức
+            // A. Update User
+            let userRef = db.collection("users").document(uid)
+            batch.updateData(userData, forDocument: userRef)
+            
+            // --- BƯỚC 3: TÌM VÀ UPDATE POSTS (Của chính user này) ---
+            let postsSnapshot = try await db.collection("posts")
+                .whereField("owner_uid", isEqualTo: uid)
+                .getDocuments()
+            
+            var postUpdateData: [String: Any] = [:]
+            postUpdateData["owner_username"] = username
+            if let newUrl = newProfileImageUrl {
+                postUpdateData["owner_image_url"] = newUrl
+            }
+            
+            for document in postsSnapshot.documents {
+                let postRef = db.collection("posts").document(document.documentID)
+                batch.updateData(postUpdateData, forDocument: postRef)
+            }
+            
+            // --- BƯỚC 4: TÌM VÀ UPDATE COMMENTS (COLLECTION GROUP QUERY) ---
+            // 🔥 QUAN TRỌNG: Tìm trong TẤT CẢ các sub-collection tên là "comments" trên toàn database
+            let commentsSnapshot = try await db.collectionGroup("comments")
+                .whereField("uid", isEqualTo: uid)
+                .getDocuments()
+            
+            var commentUpdateData: [String: Any] = [:]
+            commentUpdateData["username"] = username // Key trong Comment Model
+            if let newUrl = newProfileImageUrl {
+                commentUpdateData["profile_image_url"] = newUrl // Key trong Comment Model
+            }
+            
+            for document in commentsSnapshot.documents {
+                // document.reference tự động trỏ đúng đường dẫn (vd: posts/ID_POST/comments/ID_COMMENT)
+                batch.updateData(commentUpdateData, forDocument: document.reference)
+            }
+            
+            // --- BƯỚC 5: THỰC THI (COMMIT) ---
+            // Lưu ý: Batch giới hạn 500 lệnh. Nếu user có quá nhiều post + comment (>500), sẽ cần chia nhỏ batch.
+            // Nhưng với app vừa/nhỏ thì ok.
+            try await batch.commit()
+            
+            print("✅ Đã update: User + \(postsSnapshot.count) Posts + \(commentsSnapshot.count) Comments")
+            
+            // --- BƯỚC 6: REFRESH DATA ---
             await fetchCurrentUser()
         }
 }

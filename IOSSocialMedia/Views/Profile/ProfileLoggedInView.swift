@@ -103,7 +103,7 @@ private struct ProfileHeaderView: View {
     let user: User // Nhận model User
     
     var body: some View {
-        HStack(alignment: .center, spacing: 20) {
+        HStack(alignment: .center, spacing: 10) {
             // Avatar
             if let base64String = user.profileImageUrl, !base64String.isEmpty {
                 Base64ImageView(base64String: base64String)

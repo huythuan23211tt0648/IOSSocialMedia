@@ -9,6 +9,9 @@ import SwiftUI
 struct MainTabView: View {
     @StateObject var auth = AuthViewModel()
     
+    // 1. Tạo biến quản lý Tab hiện tại (Mặc định là 0 - Home)
+    @State private var selectedTab = 0
+    
     init() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -20,27 +23,21 @@ struct MainTabView: View {
     }
     
     var body: some View {
-        TabView {
+        // 2. Binding biến selectedTab vào TabView
+        TabView(selection: $selectedTab) {
 
             NavigationView {
-                HomeView()
+                // 3. Truyền binding này vào HomeView để HomeView có thể điều khiển
+                HomeView(selectedTab: $selectedTab)
                     .navigationTitle("Home")
             }
             .tabItem {
                 Image(systemName: "house.fill")
                 Text("Home")
             }
+            .tag(0) // 4. Đánh dấu thẻ này là số 0
 
-            NavigationView {
-                CreatePostView()
-                    .navigationTitle("Create")
-                    .navigationBarHidden(true)
-            }
-            .tabItem {
-                Image(systemName: "plus.square")
-                Text("Create")
-            }
-
+            
             NavigationView {
                 MessagesListView()
                     .navigationTitle("Messages")
@@ -49,6 +46,7 @@ struct MainTabView: View {
                 Image(systemName: "paperplane")
                 Text("Messages")
             }
+            .tag(1) // Đánh dấu thẻ này là số 2
 
             NavigationView {
                 ProfileView()
@@ -60,8 +58,8 @@ struct MainTabView: View {
                 Image(systemName: "person.crop.circle")
                 Text("Profile")
             }
-           
+            .tag(2) // 5. QUAN TRỌNG: Đánh dấu Tab Profile là số 3
+            
         }
     }
 }
-

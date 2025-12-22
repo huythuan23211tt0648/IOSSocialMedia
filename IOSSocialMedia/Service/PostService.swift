@@ -22,35 +22,69 @@ class PostService:ObservableObject {
         static let shared = PostService()
     @Published var posts: [Post] = []
     
-    //MARK: CREATE POST
-    func uploadPost(caption: String, images: [UIImage]) async throws{
-        // 1. Kiểm tra User ID
-        guard let uid = Auth.auth().currentUser?.uid else {return
-        }
-   
-        // Convert tất cả ảnh sang Base64
+
+    // MARK: CREATE POST
+        func uploadPost(caption: String, images: [UIImage]) async throws {
+            // 1. Kiểm tra User ID
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            
+            let db = Firestore.firestore()
+            
+            // 2. Convert tất cả ảnh sang Base64
             var base64Strings: [String] = []
             
             for image in images {
-                if let imageData = image.jpegData(compressionQuality: 0.2) {
-                    let str = imageData.base64EncodedString()
-                    base64Strings.append(str)
+                // Resize ảnh về 600px
+                if let resizedImage = image.resized(toWidth: 600) {
+                    // Nén ảnh JPEG chất lượng 0.5
+                    if let imageData = resizedImage.jpegData(compressionQuality: 0.5) {
+                        let str = imageData.base64EncodedString()
+                        base64Strings.append(str)
+                    }
                 }
             }
-        // lay thong tin user
-        // 3. Lấy thông tin User hiện tại (để lưu tên/avatar người đăng vào bài viết)
-                let userSnapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
-                let userData = userSnapshot.data() ?? [:]
-        print("datauser" , userData)
-        let userName = userData["username"] as? String ??  "unknow"
-//        let profileImageURL = userData["profileImageURL"] as? String
-        
-        let post = Post(ownerUid: uid, ownerUsername: userName, caption: caption, imageUrls: base64Strings, likesCount: 0, commentsCount: 0)
-        
-        try _ = Firestore.firestore().collection("posts").addDocument(from: post)
-        print("Tạo bài viết thành công")
-        
-    }
+            
+            // 3. Lấy thông tin User hiện tại
+            let userSnapshot = try await db.collection("users").document(uid).getDocument()
+            let userData = userSnapshot.data() ?? [:]
+            
+            let userName = userData["username"] as? String ?? "unknown"
+            let profileImageUrl = userData["profile_image_url"] as? String
+            
+            // 4. Tạo Object Post
+            let post = Post(
+                ownerUid: uid,
+                ownerUsername: userName,
+                ownerImageUrl: profileImageUrl,
+                caption: caption,
+                imageUrls: base64Strings,
+                likesCount: 0,
+                commentsCount: 0
+            )
+            
+            // --- BƯỚC 5: DÙNG BATCH ĐỂ GHI POST VÀ TĂNG BIẾN ĐẾM ---
+            let batch = db.batch()
+            
+            // A. Tạo Reference cho bài viết mới (Tự sinh ID)
+            let newPostRef = db.collection("posts").document()
+            
+            // B. Ghi dữ liệu bài viết vào Reference đó
+            try batch.setData(from: post, forDocument: newPostRef)
+            
+            // C. Tăng biến đếm posts_count trong User (Atomic Increment)
+            let userRef = db.collection("users").document(uid)
+            
+            // Lưu ý: Key "posts_count" phải khớp với CodingKeys trong User Model
+            batch.updateData([
+                "posts_count": FieldValue.increment(Int64(1))
+            ], forDocument: userRef)
+            
+            // D. Thực thi Batch (Gửi lên Server)
+            try await batch.commit()
+            
+            print("✅ Tạo bài viết thành công và đã tăng posts_count")
+        }
+    
     //MARK: GET LIST POST
     func fetchAllPosts() async throws -> [Post]{
         let snapshot  = try await Firestore.firestore().collection("posts").order(by: "timestamp", descending: true).getDocuments()
