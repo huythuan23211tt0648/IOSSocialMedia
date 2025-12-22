@@ -43,3 +43,9 @@ struct IOSSocialMediaApp: App {
         }
     }
 }
+enum MainTab {
+    case home
+    case create
+    case messages
+    case profile
+}

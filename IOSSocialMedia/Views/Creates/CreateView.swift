@@ -3,6 +3,8 @@ import SwiftUI
 import SwiftUI
 
 struct CreatePostView: View {
+    @Binding var selectedTab: MainTab
+
     // --- STATE ---
     // 👇 Sửa thành mảng ảnh để chứa nhiều ảnh
     @State private var selectedImages: [UIImage] = []
@@ -19,7 +21,8 @@ struct CreatePostView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) var presentationMode
     
-    init() {
+    init(selectedTab: Binding<MainTab>) {
+        self._selectedTab = selectedTab
         UITextView.appearance().backgroundColor = .clear
     }
     
@@ -84,24 +87,37 @@ struct CreatePostView: View {
     
     // HÀM UPLOAD POST (Hỗ trợ nhiều ảnh)
     func handlePost() {
-        // Kiểm tra mảng rỗng
         guard !selectedImages.isEmpty else { return }
         
         isLoading = true
         
         Task {
             do {
-                // 👇 Cần sửa PostService để nhận mảng [UIImage]
-                // Tạm thời loop qua để upload ảnh đầu tiên (demo)
-                // Hoặc bạn phải update PostService.uploadPost nhận [UIImage]
-                try await PostService.shared.uploadPost(caption: caption, images: selectedImages)
+                try await PostService.shared.uploadPost(
+                    caption: caption,
+                    images: selectedImages
+                )
                 
+                // ✅ 1. Clear input (PHẢI ở MainActor)
+                await MainActor.run {
+                    caption = ""
+                    selectedImages.removeAll()
+                    isFocused = false
+                }
+                selectedTab = .home
+
+                // ✅ 2. Tắt loading
                 isLoading = false
+
+                // ✅ 3. Chuyển màn (quay về Feed)
                 presentationMode.wrappedValue.dismiss()
+
             } catch {
-                isLoading = false
-                errorMessage = error.localizedDescription
-                showError = true
+                await MainActor.run {
+                    isLoading = false
+                    errorMessage = error.localizedDescription
+                    showError = true
+                }
             }
         }
     }
