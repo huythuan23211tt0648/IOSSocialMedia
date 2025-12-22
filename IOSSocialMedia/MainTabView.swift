@@ -8,7 +8,8 @@ import SwiftUI
 
 struct MainTabView: View {
     @StateObject var auth = AuthViewModel()
-    
+    @State private var selectedTab: MainTab = .home   // 👈 thêm dòng này
+
     init() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -18,9 +19,9 @@ struct MainTabView: View {
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
     }
-    
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {   // 👈 bind selection
 
             NavigationView {
                 HomeView()
@@ -30,9 +31,10 @@ struct MainTabView: View {
                 Image(systemName: "house.fill")
                 Text("Home")
             }
+            .tag(MainTab.home)   // 👈 tag
 
             NavigationView {
-                CreatePostView()
+                CreatePostView(selectedTab: $selectedTab) // 👈 truyền binding
                     .navigationTitle("Create")
                     .navigationBarHidden(true)
             }
@@ -40,6 +42,7 @@ struct MainTabView: View {
                 Image(systemName: "plus.square")
                 Text("Create")
             }
+            .tag(MainTab.create)
 
             NavigationView {
                 MessagesListView()
@@ -49,6 +52,7 @@ struct MainTabView: View {
                 Image(systemName: "paperplane")
                 Text("Messages")
             }
+            .tag(MainTab.messages)
 
             NavigationView {
                 ProfileView()
@@ -60,7 +64,7 @@ struct MainTabView: View {
                 Image(systemName: "person.crop.circle")
                 Text("Profile")
             }
-           
+            .tag(MainTab.profile)
         }
     }
 }
