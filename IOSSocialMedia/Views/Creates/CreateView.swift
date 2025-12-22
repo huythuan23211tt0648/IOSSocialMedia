@@ -3,7 +3,7 @@ import SwiftUI
 import SwiftUI
 
 struct CreatePostView: View {
-    @Binding var selectedTab: MainTab
+//    @Binding var selectedTab: MainTab
 
     // --- STATE ---
     // 👇 Sửa thành mảng ảnh để chứa nhiều ảnh
@@ -21,8 +21,9 @@ struct CreatePostView: View {
     @FocusState private var isFocused: Bool
     @Environment(\.presentationMode) var presentationMode
     
-    init(selectedTab: Binding<MainTab>) {
-        self._selectedTab = selectedTab
+    init(
+    ) {
+//        self._selectedTab = selectedTab
         UITextView.appearance().backgroundColor = .clear
     }
     
@@ -104,7 +105,7 @@ struct CreatePostView: View {
                     selectedImages.removeAll()
                     isFocused = false
                 }
-                selectedTab = .home
+//                selectedTab = .home
 
                 // ✅ 2. Tắt loading
                 isLoading = false

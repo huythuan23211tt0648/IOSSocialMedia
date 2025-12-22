@@ -15,7 +15,7 @@ struct HomeView: View {
                 HeaderView()
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        //                        StoryView() // Thêm Story vào cho đẹp
+//                        StoryView() // Thêm Story vào cho đẹp
                         Divider()
                         // 👇 LOGIC HIỂN THỊ BÀI VIẾT
                         if viewModel.isLoading && viewModel.posts.isEmpty {
@@ -51,23 +51,24 @@ struct HomeView: View {
     
     struct HeaderView:View {
         @State private var showCreatePost = false
+//        @Binding var selectedTab: Int
         var body: some View {
-            
+     
             HStack {
                 Group{
                     Button(action: {
-                        showCreatePost = true
-                    }) {
-                        Image(systemName: "plus.app")
-                            .font(.title2)
-                            .foregroundColor(.primary)
-                    }
-                    
+                                        showCreatePost = true
+                                    }) {
+                                        Image(systemName: "plus.app")
+                                            .font(.title2)
+                                            .foregroundColor(.primary)
+                                    }
+                  
                     // 2. Thêm spacing để các icon không dính nhau
                     Text("Instagram")
                         .font(Font.custom("Billabong", size: 24)) // Hoặc dùng .system nếu không có font
-                    
-                    
+                     
+                  
                 }.padding(.leading , 20)
                 Spacer()
                 //                Image(systemName: "camera")
@@ -131,7 +132,7 @@ struct HomeView: View {
         }
     }
 }
-//MARK: POST VIEW
+    //MARK: POST VIEW
 struct PostView: View {
     let post: Post
     @Binding var selectedTab: Int
@@ -149,18 +150,18 @@ struct PostView: View {
             // MARK: Header
             HStack {
                 if post.ownerUid == Auth.auth().currentUser?.uid {
-                    // TRƯỜNG HỢP 1: BÀI CỦA MÌNH -> DÙNG BUTTON
-                    Button(action: {
-                        selectedTab = 2 // Chỉ cần chuyển Tab là đủ
-                    }) {
-                        AvatarImage(url: post.ownerImageUrl) // Helper view cho gọn
+                        // TRƯỜNG HỢP 1: BÀI CỦA MÌNH -> DÙNG BUTTON
+                        Button(action: {
+                            selectedTab = 2 // Chỉ cần chuyển Tab là đủ
+                        }) {
+                            AvatarImage(url: post.ownerImageUrl) // Helper view cho gọn
+                        }
+                    } else {
+                        // TRƯỜNG HỢP 2: BÀI NGƯỜI KHÁC -> DÙNG NAVIGATION LINK
+                        NavigationLink(destination: OtherUserProfileView(uid: post.ownerUid)) {
+                            AvatarImage(url: post.ownerImageUrl)
+                        }
                     }
-                } else {
-                    // TRƯỜNG HỢP 2: BÀI NGƯỜI KHÁC -> DÙNG NAVIGATION LINK
-                    NavigationLink(destination: OtherUserProfileView(uid: post.ownerUid)) {
-                        AvatarImage(url: post.ownerImageUrl)
-                    }
-                }
                 Text(post.ownerUsername)
                     .font(.subheadline) // Đổi thành subheadline cho chuẩn hơn
                     .fontWeight(.semibold)
@@ -229,7 +230,7 @@ struct PostView: View {
                         .foregroundColor(isLike ? .red : .primary)
                         .scaleEffect(isLike ? 1.1 : 1.0)
                 }
-                
+
                 Button(action: { showEditProfile = true }) {
                     Image(systemName: "bubble.right")
                         .font(.title2)
@@ -270,7 +271,7 @@ struct PostView: View {
                     .padding(.horizontal)
                     .padding(.top, 1)
             }
-            
+             
             HStack(alignment: .top) {
                 Text(post.ownerUsername).fontWeight(.semibold) +
                 Text(" ") +
@@ -279,11 +280,9 @@ struct PostView: View {
             .font(.subheadline)
             .padding(.horizontal)
             .padding(.top, 1)
-            
+
             if let date = post.timestamp {
-                // Giả sử bạn có extension toShortTime()
-                // Text(date.toShortTime())
-                Text("Vừa xong") // Placeholder
+                Text(timeAgoString(from: date))
                     .font(.caption)
                     .foregroundColor(.gray)
                     .padding(.horizontal)
@@ -293,24 +292,47 @@ struct PostView: View {
         .padding(.bottom, 10)
         .sheet(isPresented: $showEditProfile) {
             if let postId = post.id {
-                // CommentsUserView(postId: postId) // Uncomment khi dùng thật
-                Text("Màn hình bình luận cho bài: \(postId)")
+                 // CommentsUserView(postId: postId) // Uncomment khi dùng thật
+                 Text("Màn hình bình luận cho bài: \(postId)")
             }
         }
+        .task {
+                    await checkLikeStatus()
+                }
         .onAppear {
             likeCount = post.likesCount
             // Check like status here
         }
     }
     
-    // MARK: Logic Functions (Placeholder)
+    func timeAgoString(from date: Date) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        return formatter.localizedString(for: date, relativeTo: Date())
+    }
+    
+    func checkLikeStatus() async {
+        guard let postId = post.id else { return }
+        do {
+            let didLike = try await PostService.shared.checkIfUserLikedPost(postId: postId)
+            withAnimation { self.isLike = didLike }
+        } catch { print("Check like error: \(error)") }
+    }
+    
     func handleLikeTapped() {
-        // Logic call API like
+        guard !isProcessing else { return }
+        isProcessing = true
+        Task {
+            do {
+                try await PostService.shared.likePost(post: post)
+                isProcessing = false
+            } catch { isProcessing = false }
+        }
     }
 }
+    
 
-
-
+    
 // MARK: AVAtar
 struct AvatarImage: View {
     let url: String?
@@ -328,172 +350,172 @@ struct AvatarImage: View {
         }
     }
 }
-// MARK: - COMMENTS VIEW (Màn hình danh sách bình luận)
-struct CommentsUserView: View {
-    @Environment(\.presentationMode) var presentationMode
-    
-    // 👇 ViewModel quản lý dữ liệu
-    @StateObject var viewModel: CommentViewModel
-    
-    // 👇 Khởi tạo với Post ID
-    init(postId: String) {
-        _viewModel = StateObject(wrappedValue: CommentViewModel(postId: postId))
-    }
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // 1. HEADER (Giữ nguyên)
-            HStack {
-                Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: "arrow.left").font(.title2).foregroundColor(.primary)
-                }
-                Spacer()
-                Text("Bình luận")
-                    .font(.headline).fontWeight(.bold)
-                Spacer()
-                Image(systemName: "paperplane").font(.title2).hidden()
+    // MARK: - COMMENTS VIEW (Màn hình danh sách bình luận)
+  struct CommentsUserView: View {
+            @Environment(\.presentationMode) var presentationMode
+            
+            // 👇 ViewModel quản lý dữ liệu
+            @StateObject var viewModel: CommentViewModel
+            
+            // 👇 Khởi tạo với Post ID
+            init(postId: String) {
+                _viewModel = StateObject(wrappedValue: CommentViewModel(postId: postId))
             }
-            .padding()
-            .background(Color(.systemBackground))
             
-            Divider()
-            
-            // 2. DANH SÁCH COMMENT
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 16) {
-                    if viewModel.isLoading {
-                        ProgressView().padding(.top, 20)
-                    } else if viewModel.comments.isEmpty {
-                        Text("Chưa có bình luận nào.")
-                            .foregroundColor(.gray)
-                            .padding(.top, 20)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    } else {
-                        // 👇 Loop qua dữ liệu thật từ ViewModel
-                        ForEach(viewModel.comments) { comment in
-                            CommentRow(comment: comment)
+            var body: some View {
+                VStack(spacing: 0) {
+                    // 1. HEADER (Giữ nguyên)
+                    HStack {
+                        Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                            Image(systemName: "arrow.left").font(.title2).foregroundColor(.primary)
                         }
+                        Spacer()
+                        Text("Bình luận")
+                            .font(.headline).fontWeight(.bold)
+                        Spacer()
+                        Image(systemName: "paperplane").font(.title2).hidden()
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    
+                    Divider()
+                    
+                    // 2. DANH SÁCH COMMENT
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 16) {
+                            if viewModel.isLoading {
+                                ProgressView().padding(.top, 20)
+                            } else if viewModel.comments.isEmpty {
+                                Text("Chưa có bình luận nào.")
+                                    .foregroundColor(.gray)
+                                    .padding(.top, 20)
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                            } else {
+                                // 👇 Loop qua dữ liệu thật từ ViewModel
+                                ForEach(viewModel.comments) { comment in
+                                    CommentRow(comment: comment)
+                                }
+                            }
+                        }
+                        .padding(.top, 10)
+                    }
+                    
+                    // 3. Ô NHẬP LIỆU (Giữ nguyên)
+                    CommentInputView(viewModel: viewModel)
+                }
+                .navigationBarHidden(true)
+                
+                // 👇👇👇 SỬA ĐOẠN NÀY: Dùng onAppear thay vì task
+                .onAppear {
+                    print("📢 Màn hình bình luận đã hiện -> Bắt đầu tải data...")
+                    Task {
+                        await viewModel.loadComments()
                     }
                 }
-                .padding(.top, 10)
             }
-            
-            // 3. Ô NHẬP LIỆU (Giữ nguyên)
-            CommentInputView(viewModel: viewModel)
         }
-        .navigationBarHidden(true)
+    
+    // MARK: - COMMENT INPUT FORM
+  struct CommentInputView: View {
+        @State private var commentText: String = ""
+        @ObservedObject var viewModel: CommentViewModel // 👇 Nhận ViewModel
         
-        // 👇👇👇 SỬA ĐOẠN NÀY: Dùng onAppear thay vì task
-        .onAppear {
-            print("📢 Màn hình bình luận đã hiện -> Bắt đầu tải data...")
-            Task {
-                await viewModel.loadComments()
+        var body: some View {
+            VStack(spacing: 0) {
+                Divider()
+                HStack(alignment: .center, spacing: 12) {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(.gray)
+                    
+                    TextField("Thêm bình luận...", text: $commentText)
+                        .font(.subheadline)
+                        .padding(10)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(20)
+                    
+                    if !commentText.isEmpty {
+                        Button("Đăng") {
+                            Task {
+                                await viewModel.sendComment(content: commentText)
+                                commentText = "" // Xóa text sau khi gửi
+                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                            }
+                        }
+                        .font(.subheadline.bold())
+                        .foregroundColor(.blue)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 10)
             }
+            .background(Color(.systemBackground))
         }
     }
-}
-
-// MARK: - COMMENT INPUT FORM
-struct CommentInputView: View {
-    @State private var commentText: String = ""
-    @ObservedObject var viewModel: CommentViewModel // 👇 Nhận ViewModel
     
-    var body: some View {
-        VStack(spacing: 0) {
-            Divider()
-            HStack(alignment: .center, spacing: 12) {
-                Image(systemName: "person.circle.fill")
-                    .resizable()
-                    .frame(width: 40, height: 40)
-                    .foregroundColor(.gray)
-                
-                TextField("Thêm bình luận...", text: $commentText)
-                    .font(.subheadline)
-                    .padding(10)
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(20)
-                
-                if !commentText.isEmpty {
-                    Button("Đăng") {
-                        Task {
-                            await viewModel.sendComment(content: commentText)
-                            commentText = "" // Xóa text sau khi gửi
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                        }
-                    }
-                    .font(.subheadline.bold())
-                    .foregroundColor(.blue)
+    // MARK: COMMENT
+    struct CommentRow: View {
+        let comment: Comment
+        
+        var body: some View {
+            HStack(alignment: .top, spacing: 12) {
+                // 1. Avatar người comment
+                // Kiểm tra xem có dữ liệu ảnh không
+                if let base64String = comment.profileImageUrl, !base64String.isEmpty {
+                    Base64ImageView(base64String: base64String)
+                        .scaledToFill() // Giữ tỷ lệ ảnh, lấp đầy khung tròn
+                        .frame(width: 36, height: 36)
+                        .clipShape(Circle())
+                } else {
+                    // Ảnh mặc định nếu không có avatar
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .frame(width: 36, height: 36)
+                        .clipShape(Circle())
+                        .foregroundColor(.gray)
                 }
+                
+                // 2. Nội dung (Tên + Comment + Thông tin phụ)
+                VStack(alignment: .leading, spacing: 4) {
+                    // Mẹo: Dùng Text + Text để nối chuỗi (Tên đậm, nội dung thường)
+                    (Text(comment.username).fontWeight(.bold) + Text("\n") + Text(comment.content))
+                        .font(.subheadline)
+                        .font(.subheadline)
+                        .foregroundColor(.primary)
+                        .fixedSize(horizontal: false, vertical: true) // Cho phép xuống dòng
+                    
+                    // Dòng phụ: Thời gian - Số lượt thích - Trả lời
+                    HStack(spacing: 15) {
+                        Text(comment.timestamp?.toShortTime() ?? "vừa xong")
+                        if comment.likeCount > 0 {
+                            Text("\(comment.likeCount) lượt thích")
+                        }
+                        Text("Trả lời")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                
+                // 3. Nút tim nhỏ bên phải
+                Image(systemName: "heart")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .padding(.top, 10)
             }
             .padding(.horizontal)
-            .padding(.vertical, 10)
+            .padding(.vertical, 8)
         }
-        .background(Color(.systemBackground))
     }
-}
-
-// MARK: COMMENT
-struct CommentRow: View {
-    let comment: Comment
     
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            // 1. Avatar người comment
-            // Kiểm tra xem có dữ liệu ảnh không
-            if let base64String = comment.profileImageUrl, !base64String.isEmpty {
-                Base64ImageView(base64String: base64String)
-                    .scaledToFill() // Giữ tỷ lệ ảnh, lấp đầy khung tròn
-                    .frame(width: 36, height: 36)
-                    .clipShape(Circle())
-            } else {
-                // Ảnh mặc định nếu không có avatar
-                Image(systemName: "person.crop.circle.fill")
-                    .resizable()
-                    .frame(width: 36, height: 36)
-                    .clipShape(Circle())
-                    .foregroundColor(.gray)
-            }
-            
-            // 2. Nội dung (Tên + Comment + Thông tin phụ)
-            VStack(alignment: .leading, spacing: 4) {
-                // Mẹo: Dùng Text + Text để nối chuỗi (Tên đậm, nội dung thường)
-                (Text(comment.username).fontWeight(.bold) + Text("\n") + Text(comment.content))
-                    .font(.subheadline)
-                    .font(.subheadline)
-                    .foregroundColor(.primary)
-                    .fixedSize(horizontal: false, vertical: true) // Cho phép xuống dòng
-                
-                // Dòng phụ: Thời gian - Số lượt thích - Trả lời
-                HStack(spacing: 15) {
-                    Text(comment.timestamp?.toShortTime() ?? "vừa xong")
-                    if comment.likeCount > 0 {
-                        Text("\(comment.likeCount) lượt thích")
-                    }
-                    Text("Trả lời")
-                }
-                .font(.caption)
-                .foregroundColor(.gray)
-            }
-            
-            Spacer()
-            
-            // 3. Nút tim nhỏ bên phải
-            Image(systemName: "heart")
-                .font(.caption)
-                .foregroundColor(.gray)
-                .padding(.top, 10)
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-    }
-}
-
-
-
-
-
-//    struct HomeView_Previews: PreviewProvider {
-//        static var previews: some View {
-//            HomeView()
-//        }
-//    }
+    
+    
+    
+    
+    //    struct HomeView_Previews: PreviewProvider {
+    //        static var previews: some View {
+    //            HomeView()
+    //        }
+    //    }

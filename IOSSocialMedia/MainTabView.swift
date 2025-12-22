@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @StateObject var auth = AuthViewModel()
+
     
     // 1. Tạo biến quản lý Tab hiện tại (Mặc định là 0 - Home)
     @State private var selectedTab = 0
@@ -50,7 +50,6 @@ struct MainTabView: View {
 
             NavigationView {
                 ProfileView()
-                    .environmentObject(auth)
                     .navigationTitle("Profile")
                     .navigationBarHidden(true)
             }

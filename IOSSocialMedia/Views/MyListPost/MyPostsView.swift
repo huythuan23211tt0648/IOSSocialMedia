@@ -78,20 +78,30 @@ struct MyPostsView: View {
         .navigationTitle("Bài viết")
         .navigationBarTitleDisplayMode(.inline)
         // 👇👇👇 THÊM ĐOẠN NÀY VÀO ĐÂY 👇👇👇
-                
-                // 1. Ẩn TabBar khi vào màn hình này
-                .background(
-                    TabBarAccessor { tabBar in
-                        tabBar.isHidden = true
-                    }
-                )
-                // 2. Hiện lại TabBar khi thoát ra (để không mất TabBar ở các màn hình khác)
-                .onDisappear {
-                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                       let tabBarController = windowScene.windows.first?.rootViewController as? UITabBarController {
-                        tabBarController.tabBar.isHidden = false
-                    }
+        .navigationBarHidden(false)
+        // 1. Ẩn TabBar khi vào màn hình này
+        .background(
+            TabBarAccessor { tabBar in
+                tabBar.isHidden = true
+            }
+        )
+        // 2. Hiện lại TabBar khi thoát ra (để không mất TabBar ở các màn hình khác)
+        .onDisappear {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            let root = windowScene?.windows.first?.rootViewController
+            
+            // Cách 1: Tìm xem Root có phải là TabBarController không
+            if let tabBarController = root as? UITabBarController {
+                tabBarController.tabBar.isHidden = false
+            }
+            // Cách 2: (Trường hợp phổ biến của SwiftUI) Tìm trong các con của Root
+            else {
+                // Duyệt qua các view con để tìm TabBarController
+                if let tabBarController = root?.children.first(where: { $0 is UITabBarController }) as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
                 }
+            }
+        }
     }
     
     // --- HÀM SCROLL RIÊNG ---
@@ -124,7 +134,7 @@ struct MyPostsView: View {
 struct MyPostRowView: View {
     let post: Post
     var onDeleteSuccess: (() -> Void)?
-
+    
     @State private var isLike = false
     @State private var likeCount = 0
     @State private var showComments = false
@@ -167,7 +177,7 @@ struct MyPostRowView: View {
                             .padding(10)
                     }
                 }
-             
+                
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
@@ -233,7 +243,7 @@ struct MyPostRowView: View {
             .font(.subheadline)
             .padding(.horizontal)
             .padding(.top, 1)
-
+            
             if let date = post.timestamp {
                 Text(timeAgoString(from: date))
                     .font(.caption)

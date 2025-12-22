@@ -7,7 +7,7 @@ struct ProfileLoggedInView: View {
     
     // 1. Khởi tạo Service
     @StateObject var userService = UserService()
-    
+
     // 2. Giả sử PostService đã có sẵn (bạn inject vào hoặc khởi tạo mới)
     @ObservedObject var postService = PostService.shared
     
@@ -80,7 +80,7 @@ struct ProfileLoggedInView: View {
 private struct HeaderView: View {
     @Binding var isDarkMode: Bool
     var username: String // Nhận tên user
-    
+    @EnvironmentObject var authViewModel: AuthViewModel
     var body: some View {
         HStack {
             Text(username) // Hiển thị tên user trên thanh header
@@ -90,8 +90,32 @@ private struct HeaderView: View {
                 Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
                     .font(.title2).foregroundColor(.primary)
             }
-            Image(systemName: "line.3.horizontal")
-                .font(.title2).padding(.leading, 15)
+            Menu {
+                // 👇 Các nút con bên trong Menu
+                
+                // Nút 1: Cài đặt (Ví dụ thêm vào cho đỡ trống)
+                Button(action: {
+                    print("Mở cài đặt")
+                }) {
+                    Label("Cài đặt", systemImage: "gear")
+                }
+                
+                // Nút 2: Đăng xuất (Dùng role .destructive để chữ màu đỏ)
+                Button(role: .destructive, action: {
+                    authViewModel.signOut()
+                }) {
+                    Label("Đăng xuất", systemImage: "rectangle.portrait.and.arrow.right")
+                }
+                
+            } label: {
+                // 👇 Hình ảnh hiển thị bên ngoài (Hamburger icon)
+                Image(systemName: "line.3.horizontal")
+                    .font(.title2)
+                    .padding(.leading, 15)
+                    .foregroundColor(.primary) // Thêm màu để đảm bảo hiển thị tốt trên Dark Mode
+            }
+           
+            
         }
         .padding()
         .background(Color(UIColor.systemBackground))

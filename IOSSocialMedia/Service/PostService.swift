@@ -127,12 +127,14 @@ class PostService:ObservableObject {
         let postRef = db.collection("posts").document(postId)
         let likeRef = postRef.collection("likes").document(uid)
 
-        try await db.runTransaction { transaction, errorPointer in
+       _ = try await db.runTransaction { transaction, errorPointer in
                     let likeSnapshot: DocumentSnapshot
                     do {
                         likeSnapshot = try transaction.getDocument(likeRef)
+                        print("like thanh cong")
                     } catch let error as NSError {
                         errorPointer?.pointee = error
+                        print("like fail")
                         return nil
                     }
 

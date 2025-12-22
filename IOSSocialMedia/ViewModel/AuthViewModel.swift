@@ -9,6 +9,16 @@ class AuthViewModel: ObservableObject {
     private let auth = Auth.auth()
     private let db = Firestore.firestore()
     
+    // 👇 1. THÊM INIT ĐỂ TỰ ĐỘNG KIỂM TRA ĐĂNG NHẬP
+        init() {
+            // Kiểm tra xem trong Firebase có lưu session cũ không
+            if auth.currentUser != nil {
+                self.isLoggedIn = true
+            } else {
+                self.isLoggedIn = false
+            }
+        }
+    
     /// Đăng ký tài khoản mới với Firebase Auth và lưu thông tin vào Firestore
     func register(name: String,
                   email: String,
@@ -74,4 +84,20 @@ class AuthViewModel: ObservableObject {
             }
         }
     }
+    // 👇 2. HÀM SIGN OUT ĐÃ SỬA
+        func signOut() {
+            do {
+                // Gọi lệnh đăng xuất của Firebase
+                try auth.signOut()
+                
+                // Cập nhật lại biến isLoggedIn về false để View chuyển màn hình
+                DispatchQueue.main.async {
+                    self.isLoggedIn = false
+                }
+                
+                print("✅ Đã đăng xuất thành công")
+            } catch let error {
+                print("❌ Lỗi đăng xuất: \(error.localizedDescription)")
+            }
+        }
 }
