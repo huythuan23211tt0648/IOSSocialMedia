@@ -292,8 +292,8 @@ struct PostView: View {
         .padding(.bottom, 10)
         .sheet(isPresented: $showEditProfile) {
             if let postId = post.id {
-                 // CommentsUserView(postId: postId) // Uncomment khi dùng thật
-                 Text("Màn hình bình luận cho bài: \(postId)")
+                  CommentsUserView(postId: postId) // Uncomment khi dùng thật
+//                 Text("Màn hình bình luận cho bài: \(postId)")
             }
         }
         .task {
