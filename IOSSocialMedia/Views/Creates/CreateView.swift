@@ -45,7 +45,7 @@ struct CreatePostView: View {
                 VStack(spacing: 24) {
                     // View con hiển thị ảnh (đã chọn)
                     PostImagePickerView(
-                        selectedImages: selectedImages,
+                        selectedImages: $selectedImages,
                         showImagePicker: $showImagePicker
                     )
                     
@@ -163,43 +163,131 @@ struct CustomToolbarView: View {
     }
 }
 
-// MARK: - 2. VIEW CON: CHỌN ẢNH
+// MARK: - 2. VIEW CON: CHỌN ẢNH c1
+//struct PostImagePickerView: View {
+//    let selectedImages: [UIImage] // Nhận mảng ảnh
+//    @Binding var showImagePicker: Bool
+//    
+//    var body: some View {
+//        if !selectedImages.isEmpty {
+//            // TRƯỜNG HỢP: Đã chọn ảnh -> Hiện Slider lướt ngang
+//            ZStack(alignment: .topTrailing) {
+//                
+//                TabView {
+//                    ForEach(0..<selectedImages.count, id: \.self) { index in
+//                        Image(uiImage: selectedImages[index])
+//                            .resizable()
+//                            .scaledToFill()
+//                            .frame(height: 350)
+//                            .clipped()
+//                            // 👇 Tag quan trọng để TabView chạy đúng
+//                            .tag(index)
+//                    }
+//                }
+//                .tabViewStyle(PageTabViewStyle()) // Hiện dấu chấm tròn
+//                .frame(height: 350)
+//                .clipShape(RoundedRectangle(cornerRadius: 12))
+//                
+//                // Nút Sửa ảnh (Góc trên phải)
+//                Button(action: { showImagePicker = true }) {
+//                    Image(systemName: "pencil.circle.fill")
+//                        .font(.system(size: 30))
+//                        .foregroundColor(.blue)
+//                        .background(Color.white.clipShape(Circle()))
+//                        .shadow(radius: 2)
+//                        .padding(10)
+//                }
+//            }
+//        } else {
+//            // TRƯỜNG HỢP: Chưa chọn ảnh -> Hiện nút thêm
+//            Button(action: { showImagePicker = true }) {
+//                ZStack {
+//                    RoundedRectangle(cornerRadius: 12)
+//                        .fill(Color(.secondarySystemBackground))
+//                        .frame(height: 250)
+//                    
+//                    RoundedRectangle(cornerRadius: 12)
+//                        .stroke(style: StrokeStyle(lineWidth: 1, dash: [6]))
+//                        .foregroundColor(.gray.opacity(0.5))
+//                        .frame(height: 250)
+//                    
+//                    VStack(spacing: 12) {
+//                        Image(systemName: "photo.on.rectangle")
+//                            .font(.system(size: 44))
+//                            .foregroundColor(.blue)
+//                        Text("Nhấn để chọn ảnh")
+//                            .font(.headline)
+//                            .foregroundColor(.gray)
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
+
+
+// MARK: - 2. VIEW CON: CHỌN ẢNH (Dạng Lưới)
 struct PostImagePickerView: View {
-    let selectedImages: [UIImage] // Nhận mảng ảnh
+    @Binding var selectedImages: [UIImage] // Dùng Binding để có thể xóa ảnh
     @Binding var showImagePicker: Bool
+    
+    // Cấu hình lưới: 3 cột, khoảng cách 2px
+    let columns = [
+        GridItem(.flexible(), spacing: 2),
+        GridItem(.flexible(), spacing: 2),
+        GridItem(.flexible(), spacing: 2)
+    ]
     
     var body: some View {
         if !selectedImages.isEmpty {
-            // TRƯỜNG HỢP: Đã chọn ảnh -> Hiện Slider lướt ngang
-            ZStack(alignment: .topTrailing) {
-                
-                TabView {
-                    ForEach(0..<selectedImages.count, id: \.self) { index in
-                        Image(uiImage: selectedImages[index])
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 350)
-                            .clipped()
-                            // 👇 Tag quan trọng để TabView chạy đúng
-                            .tag(index)
+            VStack(alignment: .leading) {
+                // Tiêu đề nhỏ
+                HStack {
+                    Text("Ảnh đã chọn (\(selectedImages.count))")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    
+                    Spacer()
+                    
+                    // Nút thêm ảnh
+                    Button(action: { showImagePicker = true }) {
+                        Label("Thêm", systemImage: "plus")
+                            .font(.caption.bold())
                     }
                 }
-                .tabViewStyle(PageTabViewStyle()) // Hiện dấu chấm tròn
-                .frame(height: 350)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding(.bottom, 5)
                 
-                // Nút Sửa ảnh (Góc trên phải)
-                Button(action: { showImagePicker = true }) {
-                    Image(systemName: "pencil.circle.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(.blue)
-                        .background(Color.white.clipShape(Circle()))
-                        .shadow(radius: 2)
-                        .padding(10)
+                // --- LƯỚI ẢNH ---
+                LazyVGrid(columns: columns, spacing: 2) {
+                    // Duyệt qua mảng ảnh kèm Index để xử lý xóa
+                    ForEach(0..<selectedImages.count, id: \.self) { index in
+                        ZStack(alignment: .topTrailing) {
+                            
+                            // 1. Hình ảnh
+                            Image(uiImage: selectedImages[index])
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: (UIScreen.main.bounds.width - 40) / 3, height: 120) // Chia 3 cột
+                                .clipped()
+                                .cornerRadius(4)
+                            
+                            // 2. Nút Xóa (Dấu X góc phải)
+                            Button(action: {
+                                withAnimation {
+                                    removeImage(at: index)
+                                }
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.white)
+                                    .background(Color.black.opacity(0.6).clipShape(Circle()))
+                                    .padding(4)
+                            }
+                        }
+                    }
                 }
             }
         } else {
-            // TRƯỜNG HỢP: Chưa chọn ảnh -> Hiện nút thêm
+            // TRƯỜNG HỢP: Chưa chọn ảnh (Giữ nguyên giao diện cũ)
             Button(action: { showImagePicker = true }) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
@@ -223,8 +311,13 @@ struct PostImagePickerView: View {
             }
         }
     }
+    
+    // Hàm xóa ảnh khỏi mảng
+    func removeImage(at index: Int) {
+        guard index < selectedImages.count else { return }
+        selectedImages.remove(at: index)
+    }
 }
-
 // MARK: - 3. VIEW CON: NHẬP TEXT
 struct PostCaptionInputView: View {
     @Binding var caption: String

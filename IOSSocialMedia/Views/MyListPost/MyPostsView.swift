@@ -131,10 +131,19 @@ struct MyPostsView: View {
 }
 
 // MARK: - ROW VIEW (Giữ nguyên không thay đổi)
+import SwiftUI
+import FirebaseAuth
+
 struct MyPostRowView: View {
     let post: Post
     var onDeleteSuccess: (() -> Void)?
     
+    // --- STATE QUẢN LÝ DỮ LIỆU HIỂN THỊ (OPTIMISTIC UI) ---
+    // Dùng biến này để hiển thị thay cho post gốc, giúp UI cập nhật ngay khi sửa xong
+    @State private var displayCaption: String = ""
+    @State private var displayImages: [String] = []
+    
+    // --- STATE UI & LOGIC ---
     @State private var isLike = false
     @State private var likeCount = 0
     @State private var showComments = false
@@ -142,11 +151,18 @@ struct MyPostRowView: View {
     @State private var showDeleteAlert = false
     @State private var isDeleting = false
     
+    // State cho chức năng Edit
+    @State private var showEditSheet = false
+    
+    // State cho Carousel ảnh
+    @State private var currentImageIndex = 0
+    
     var body: some View {
         VStack(alignment: .leading) {
             
-            // --- HEADER ---
+            // MARK: 1. HEADER (Avatar + Username + Menu)
             HStack {
+                // Avatar
                 if let base64String = post.ownerImageUrl, !base64String.isEmpty {
                     Base64ImageView(base64String: base64String)
                         .scaledToFill()
@@ -159,13 +175,24 @@ struct MyPostRowView: View {
                         .foregroundColor(.gray)
                 }
                 
+                // Username
                 Text(post.ownerUsername)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                 
                 Spacer()
-                if(post.ownerUid == Auth.auth().currentUser?.uid ){
+                
+                // MENU (Chỉ hiện nếu là bài của mình)
+                if post.ownerUid == Auth.auth().currentUser?.uid {
                     Menu {
+                        // Nút Chỉnh sửa
+                        Button {
+                            showEditSheet = true
+                        } label: {
+                            Label("Chỉnh sửa", systemImage: "pencil")
+                        }
+                        
+                        // Nút Xóa
                         Button(role: .destructive) {
                             showDeleteAlert = true
                         } label: {
@@ -177,25 +204,53 @@ struct MyPostRowView: View {
                             .padding(10)
                     }
                 }
-                
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
             
-            // --- IMAGE ---
-            if let base64String = post.imageUrls.first {
-                Base64ImageView(base64String: base64String)
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(1, contentMode: .fit)
-                    .clipped()
+            // MARK: 2. IMAGE CAROUSEL (Hiển thị nhiều ảnh)
+            // Sử dụng displayImages để hiển thị (cập nhật được khi sửa)
+            if !displayImages.isEmpty {
+                ZStack(alignment: .topTrailing) {
+                    // TabView vuốt ảnh
+                    TabView(selection: $currentImageIndex) {
+                        ForEach(Array(displayImages.enumerated()), id: \.offset) { index, base64String in
+                            Base64ImageView(base64String: base64String)
+                                .scaledToFill()
+                                .frame(maxWidth: .infinity)
+                                .clipped()
+                                .tag(index) // Tag để tracking trang hiện tại
+                        }
+                    }
+                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never)) // Tắt chấm mặc định
+                    .frame(height: 400)
                     .background(Color.gray.opacity(0.1))
+                    
+                    // Bộ đếm số trang (1/3) - Chỉ hiện nếu > 1 ảnh
+                    if displayImages.count > 1 {
+                        Text("\(currentImageIndex + 1)/\(displayImages.count)")
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.black.opacity(0.6))
+                            .clipShape(Capsule())
+                            .padding(12)
+                    }
+                }
+                .frame(height: 400)
             } else {
-                Rectangle().frame(height: 400).foregroundColor(.gray.opacity(0.3))
+                // Placeholder nếu không có ảnh (hoặc xóa hết ảnh)
+                Rectangle()
+                    .fill(Color.gray.opacity(0.1))
+                    .frame(height: 200) // Thu nhỏ lại nếu không có ảnh
+                    .overlay(Text("Không có ảnh").foregroundColor(.gray))
             }
             
-            // --- ACTION BUTTONS ---
+            // MARK: 3. ACTION BUTTONS
             HStack(spacing: 16) {
+                // Like Button
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                         isLike.toggle()
@@ -209,6 +264,7 @@ struct MyPostRowView: View {
                         .scaleEffect(isLike ? 1.1 : 1.0)
                 }
                 
+                // Comment Button
                 Button(action: { showComments = true }) {
                     Image(systemName: "bubble.right")
                         .font(.title2)
@@ -220,13 +276,27 @@ struct MyPostRowView: View {
                 
                 Spacer()
                 
+                // Dots Indicator (Chấm tròn bên dưới)
+                if displayImages.count > 1 {
+                    HStack(spacing: 4) {
+                        ForEach(0..<displayImages.count, id: \.self) { index in
+                            Circle()
+                                .fill(currentImageIndex == index ? Color.blue : Color.gray.opacity(0.5))
+                                .frame(width: 6, height: 6)
+                        }
+                    }
+                    .padding(.leading, -20) // Cân giữa lại chút do Spacer bên trái
+                }
+                
+                Spacer()
+                
                 Image(systemName: "bookmark")
                     .font(.title2)
             }
             .padding(.horizontal)
             .padding(.top, 4)
             
-            // --- INFO ---
+            // MARK: 4. INFO & CAPTION
             if likeCount > 0 {
                 Text("\(likeCount) lượt thích")
                     .font(.subheadline)
@@ -235,15 +305,16 @@ struct MyPostRowView: View {
                     .padding(.top, 1)
             }
             
+            // Caption (Dùng displayCaption để cập nhật khi sửa)
             HStack(alignment: .top) {
                 Text(post.ownerUsername).fontWeight(.semibold) +
                 Text(" ") +
-                Text(post.caption)
+                Text(displayCaption) // ✅ Biến này thay đổi ngay khi Edit xong
             }
             .font(.subheadline)
             .padding(.horizontal)
             .padding(.top, 1)
-            
+
             if let date = post.timestamp {
                 Text(timeAgoString(from: date))
                     .font(.caption)
@@ -253,17 +324,45 @@ struct MyPostRowView: View {
             }
         }
         .padding(.bottom, 10)
+        
+        // --- CÁC MODIFIER XỬ LÝ LOGIC ---
+        
+        // 1. Khởi tạo dữ liệu khi View hiện ra
+        .onAppear {
+            likeCount = post.likesCount
+            // Nạp dữ liệu gốc vào biến hiển thị
+            if displayCaption.isEmpty { displayCaption = post.caption }
+            if displayImages.isEmpty { displayImages = post.imageUrls }
+        }
+        
+        // 2. Check like status từ server
+        .task {
+            await checkLikeStatus()
+        }
+        
+        // 3. Sheet Bình luận
         .sheet(isPresented: $showComments) {
             if let postId = post.id {
                 CommentsUserView(postId: postId)
             }
         }
-        .task {
-            await checkLikeStatus()
+        
+        // 4. Sheet Chỉnh sửa (Edit)
+        .sheet(isPresented: $showEditSheet) {
+            // Gọi View Edit mà chúng ta đã tạo ở bước trước
+            EditPostView(post: post) { newCaption, newImages in
+                // 👇 CALLBACK: Chạy khi bấm Lưu thành công
+                // Cập nhật UI ngay lập tức
+                self.displayCaption = newCaption
+                
+                if let newImages = newImages {
+                    self.displayImages = newImages
+                    self.currentImageIndex = 0 // Reset về ảnh đầu tiên để tránh lỗi index
+                }
+            }
         }
-        .onAppear {
-            likeCount = post.likesCount
-        }
+        
+        // 5. Alert Xóa bài
         .alert("Xóa bài viết?", isPresented: $showDeleteAlert) {
             Button("Hủy", role: .cancel) {}
             Button("Xóa", role: .destructive) {
@@ -274,7 +373,8 @@ struct MyPostRowView: View {
         }
     }
     
-    // Logic functions giữ nguyên
+    // MARK: - LOGIC FUNCTIONS
+    
     func performDelete() {
         guard let postId = post.id else { return }
         isDeleting = true
@@ -283,7 +383,7 @@ struct MyPostRowView: View {
                 try await PostService.shared.deletePost(postId: postId)
                 await MainActor.run {
                     isDeleting = false
-                    onDeleteSuccess?()
+                    onDeleteSuccess?() // Báo cho View cha xóa row này đi
                 }
             } catch {
                 print("Lỗi xóa bài: \(error)")

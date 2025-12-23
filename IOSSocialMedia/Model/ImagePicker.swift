@@ -33,6 +33,7 @@ struct UniversalImagePicker: UIViewControllerRepresentable {
         var config = PHPickerConfiguration()
         config.filter = .images // Chỉ lấy ảnh, không lấy video
         config.selectionLimit = limit // 1 hoặc nhiều
+        config.preferredAssetRepresentationMode = .current
         
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator

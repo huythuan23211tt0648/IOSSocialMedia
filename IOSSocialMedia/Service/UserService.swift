@@ -138,4 +138,67 @@ class UserService: ObservableObject {
             // --- BƯỚC 6: REFRESH DATA ---
             await fetchCurrentUser()
         }
+    
+    
+    // 1. Hàm Follow
+        func follow(uid: String) async throws {
+            guard let currentUid = Auth.auth().currentUser?.uid else { return }
+            
+            let followingRef = Firestore.firestore().collection("users").document(currentUid).collection("user-following").document(uid)
+            let followersRef = Firestore.firestore().collection("users").document(uid).collection("user-followers").document(currentUid)
+            
+            let currentUserRef = Firestore.firestore().collection("users").document(currentUid)
+            let targetUserRef = Firestore.firestore().collection("users").document(uid)
+            
+          _ =  try await Firestore.firestore().runTransaction { (transaction, errorPointer) -> Any? in
+                // Tạo document trong sub-collection
+                transaction.setData([:], forDocument: followingRef)
+                transaction.setData([:], forDocument: followersRef)
+                
+                // Tăng số lượng following của mình
+                transaction.updateData(["following_count": FieldValue.increment(Int64(1))], forDocument: currentUserRef)
+                
+                // Tăng số lượng followers của người kia
+                transaction.updateData(["followers_count": FieldValue.increment(Int64(1))], forDocument: targetUserRef)
+                
+                return nil
+            }
+        }
+        
+        // 2. Hàm Unfollow
+        func unfollow(uid: String) async throws {
+            guard let currentUid = Auth.auth().currentUser?.uid else { return }
+            
+            let followingRef = Firestore.firestore().collection("users").document(currentUid).collection("user-following").document(uid)
+            let followersRef = Firestore.firestore().collection("users").document(uid).collection("user-followers").document(currentUid)
+            
+            let currentUserRef = Firestore.firestore().collection("users").document(currentUid)
+            let targetUserRef = Firestore.firestore().collection("users").document(uid)
+            
+           _ = try await Firestore.firestore().runTransaction { (transaction, errorPointer) -> Any? in
+                // Xóa document
+                transaction.deleteDocument(followingRef)
+                transaction.deleteDocument(followersRef)
+                
+                // Giảm số lượng
+                transaction.updateData(["following_count": FieldValue.increment(Int64(-1))], forDocument: currentUserRef)
+                transaction.updateData(["followers_count": FieldValue.increment(Int64(-1))], forDocument: targetUserRef)
+                
+                return nil
+            }
+        }
+        
+        // 3. Kiểm tra xem mình đã follow người này chưa
+        func checkIfUserIsFollowed(uid: String) async throws -> Bool {
+            guard let currentUid = Auth.auth().currentUser?.uid else { return false }
+            
+            let snapshot = try await Firestore.firestore()
+                .collection("users")
+                .document(currentUid)
+                .collection("user-following")
+                .document(uid)
+                .getDocument()
+            
+            return snapshot.exists
+        }
 }

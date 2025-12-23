@@ -254,6 +254,37 @@ class PostService:ObservableObject {
         // Map dữ liệu từ Firestore sang mảng [Comment]
                 return snapshot.documents.compactMap({ try? $0.data(as: Comment.self) })
     }
+
+//MARK: UPDATE
+    func updatePost(postId: String, caption: String, images: [UIImage]) async throws {
+        let db = Firestore.firestore()
+        
+        // 1. Xử lý ảnh: Convert lại toàn bộ mảng ảnh hiện tại sang Base64
+        // (Giống hệt logic trong uploadPost)
+        var base64Strings: [String] = []
+        
+        for image in images {
+            // Resize ảnh về 600px để tối ưu dung lượng
+            if let resizedImage = image.resized(toWidth: 600) {
+                // Nén ảnh JPEG chất lượng 0.5
+                if let imageData = resizedImage.jpegData(compressionQuality: 0.5) {
+                    let str = imageData.base64EncodedString()
+                    base64Strings.append(str)
+                }
+            }
+        }
+        
+        // 2. Tạo data update
+        // Lưu ý: Key "image_urls" phải khớp với tên field trên Firestore của bạn
+        // Nếu bạn dùng Codable là imageUrls thì check lại Firestore xem nó lưu là gì (thường là snake_case nếu dùng @PropertyName)
+        let updateData: [String: Any] = [
+            "caption": caption,
+            "image_urls": base64Strings
+        ]
+        
+        // 3. Gửi lên Firestore
+        try await db.collection("posts").document(postId).updateData(updateData)
+    }
     
     
 }

@@ -37,7 +37,7 @@ struct OtherUserProfileView: View {
                             BioView(user: user)
                             
                             // 2. Nút hành động (Follow/Message)
-                            ActionButtonsView()
+                            ActionButtonsView(user: user)
                             
                             // 3. Highlights & Tabs
                             HighlightView()
@@ -125,7 +125,7 @@ private struct ProfileHeaderView: View {
     }
 }
 
-// 2. StatView (Giữ nguyên)
+// MARK: 2. StatView (Giữ nguyên)
 private struct StatView: View {
     let number: String
     let label: String
@@ -137,7 +137,7 @@ private struct StatView: View {
     }
 }
 
-// 3. BioView (Giữ nguyên)
+// MARK: 3. BioView (Giữ nguyên)
 private struct BioView: View {
     let user: User
     var body: some View {
@@ -155,16 +155,21 @@ private struct BioView: View {
     }
 }
 
-// 4. ActionButtonsView (Nút Follow/Message - Dành cho người lạ)
+// MARK: 4. ActionButtonsView (Nút Follow/Message - Dành cho người lạ)
+// 1. Sửa 'rivate' thành 'private'
 private struct ActionButtonsView: View {
+    // 👇 2. THÊM BIẾN NÀY ĐỂ NHẬN DỮ LIỆU NGƯỜI CẦN FOLLOW
+    let user: User
+    
     @State private var isFollowing = false
+    @State private var isProcessing = false
     
     var body: some View {
         HStack(spacing: 8) {
             Button(action: {
                 withAnimation(.easeInOut(duration: 0.2)) {
-                    isFollowing.toggle()
-                    // TODO: Gọi API Follow/Unfollow tại đây
+                    // Không toggle ở đây, để hàm handle xử lý logic cho an toàn
+                    handleFollowTapped()
                 }
             }) {
                 Text(isFollowing ? "Đang theo dõi" : "Theo dõi")
@@ -175,6 +180,7 @@ private struct ActionButtonsView: View {
                     .foregroundColor(isFollowing ? .primary : .white)
                     .cornerRadius(8)
             }
+            .disabled(isProcessing) // Khóa nút khi đang xử lý
             
             Button(action: {}) {
                 Text("Nhắn tin")
@@ -187,10 +193,60 @@ private struct ActionButtonsView: View {
             }
         }
         .padding(.vertical, 10)
+        .task {
+            await checkFollowStatus()
+        }
+    }
+    
+    // --- LOGIC ---
+    
+    func checkFollowStatus() async {
+        // 👇 3. SỬA: Lấy ID của người đang xem (Target User), KHÔNG LẤY current user
+        guard let targetUid = user.id else { return }
+        
+        do {
+            // Hàm này kiểm tra: "Tôi (Auth) có đang follow ông (targetUid) không?"
+            let status = try await UserService().checkIfUserIsFollowed(uid: targetUid)
+            await MainActor.run { isFollowing = status }
+        } catch {
+            print("Lỗi check follow: \(error)")
+        }
+    }
+    
+    func handleFollowTapped() {
+        // 👇 4. SỬA: Lấy ID của người đang xem (Target User)
+        guard let targetUid = user.id else { return }
+        
+        isProcessing = true
+        
+        // Optimistic Update
+        let previousState = isFollowing
+        isFollowing.toggle()
+        
+        Task {
+            do {
+                if previousState {
+                    // Unfollow người có id là targetUid
+                    try await UserService().unfollow(uid: targetUid)
+                    print("Đã hủy theo dõi")
+                } else {
+                    // Follow người có id là targetUid
+                    try await UserService().follow(uid: targetUid)
+                    print("Đã theo dõi")
+                }
+                isProcessing = false
+            } catch {
+                print("Lỗi follow API: \(error)")
+                await MainActor.run {
+                    isFollowing = previousState // Hoàn tác nếu lỗi
+                    isProcessing = false
+                }
+            }
+        }
     }
 }
 
-// 5. Highlight & Tabs (Giữ nguyên - Chỉ là UI tĩnh)
+// MARK: . Highlight & Tabs (Giữ nguyên - Chỉ là UI tĩnh)
 private struct HighlightView: View {
     var body: some View {
         // ... (Copy code cũ)
@@ -207,7 +263,7 @@ private struct TabsView: View {
     }
 }
 
-// 6. PhotoGridsView (Đã sửa để nhận userId từ bên ngoài)
+// MARK: . PhotoGridsView (Đã sửa để nhận userId từ bên ngoài)
 private struct PhotoGridsView: View {
     let posts: [Post]
     let userId: String // ID của chủ nhân trang cá nhân này
